@@ -17,32 +17,11 @@
 package grails.plugins.crm.product
 
 /**
- * Defines a product price.
+ * Command object used by CrmProductController#list()
  */
-class CrmProductPrice {
-
-    CrmPriceList priceList
-
-    String unit
-    Float fromAmount
-    Float inPrice
-    Float outPrice
-    Float vat
-
-    static belongsTo = [product:CrmProduct]
-
-    static constraints = {
-        unit(maxSize: 40, blank: false)
-        inPrice(min:-999999f, max:999999f, scale:2, nullable: false)
-        outPrice(min:-999999f, max:999999f, scale:2, nullable: false)
-        vat(min: 0f, max: 1f, scale: 2)
-    }
-
-    static mapping = {
-        sort 'fromAmount'
-    }
-
-    String toString() {
-        "$outPrice / $unit".toString()
-    }
+class CrmProductQueryCommand implements Serializable {
+    String number
+    String name
+    String supplier
+    String productGroup
 }

@@ -16,6 +16,7 @@
 
 package grails.plugins.crm.product
 
+import grails.events.Listener
 import grails.plugins.crm.core.TenantUtils
 import grails.plugins.crm.core.SearchUtils
 import org.codehaus.groovy.grails.web.metaclass.BindDynamicMethod
@@ -23,6 +24,18 @@ import org.codehaus.groovy.grails.web.metaclass.BindDynamicMethod
 class CrmProductService {
 
     static transactional = true
+
+    def crmSecurityService
+    def crmTagService
+
+    @Listener(namespace = "crmProduct", topic = "enableFeature")
+    def enableFeature(event) {
+        // event = [feature: feature, tenant: tenant, role:role, expires:expires]
+        def tenant = crmSecurityService.getTenantInfo(event.tenant)
+        TenantUtils.withTenant(tenant.id) {
+            crmTagService.createTag(name: CrmProduct.name, multiple: true)
+        }
+    }
 
     /**
      * Empty query = search all records.
@@ -64,18 +77,23 @@ class CrmProductService {
         }
     }
 
-    CrmProduct createProduct(params) {
+    CrmProduct createProduct(Map params, boolean save = false) {
         def tenant = TenantUtils.tenant
         def m = CrmProduct.findByNumberAndTenantId(params.number, tenant)
         if (!m) {
-            m = new CrmProduct(tenantId: TenantUtils.tenant)
+            m = new CrmProduct()
             def args = [m, params, [include: CrmProduct.BIND_WHITELIST]]
             new BindDynamicMethod().invoke(m, 'bind', args.toArray())
+            m.tenantId = tenant
             if (params.enabled == null) {
                 m.enabled = true
             }
-            m.validate()
-            m.clearErrors()
+            if (save) {
+                m.save()
+            } else {
+                m.validate()
+                m.clearErrors()
+            }
         }
         return m
     }
@@ -94,18 +112,21 @@ class CrmProductService {
         CrmProductGroup.findAllByTenantId(TenantUtils.tenant, params)
     }
 
-    CrmProductGroup createProductGroup(params) {
+    CrmProductGroup createProductGroup(Map params, boolean save = false) {
         def tenant = TenantUtils.tenant
         def m = CrmProductGroup.findByNameAndTenantId(params.name, tenant)
         if (!m) {
-            m = new CrmProductGroup()
-            m.properties = params
+            m = new CrmProductGroup(params)
             m.tenantId = tenant
             if (params.enabled == null) {
                 m.enabled = true
             }
-            m.validate()
-            m.clearErrors()
+            if (save) {
+                m.save()
+            } else {
+                m.validate()
+                m.clearErrors()
+            }
         }
         return m
     }
@@ -124,8 +145,8 @@ class CrmProductService {
         CrmPriceList.findAllByTenantId(TenantUtils.tenant, params)
     }
 
-    CrmPriceList createPriceList(Map params) {
-       def tenant = TenantUtils.tenant
+    CrmPriceList createPriceList(Map params, boolean save = false) {
+        def tenant = TenantUtils.tenant
         def m = CrmPriceList.findByNameAndTenantId(params.name, tenant)
         if (!m) {
             m = new CrmPriceList()
@@ -134,8 +155,12 @@ class CrmProductService {
             if (params.enabled == null) {
                 m.enabled = true
             }
-            m.validate()
-            m.clearErrors()
+            if (save) {
+                m.save()
+            } else {
+                m.validate()
+                m.clearErrors()
+            }
         }
         return m
     }

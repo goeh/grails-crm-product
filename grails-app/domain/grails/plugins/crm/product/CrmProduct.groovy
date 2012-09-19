@@ -22,6 +22,8 @@ import grails.plugins.crm.core.TenantEntity
 @TenantEntity
 class CrmProduct {
 
+    public static final List BIND_WHITELIST = ['number', 'name', 'displayName', 'description', 'supplier', 'suppliersNumber', 'group', 'barcode', 'customsCode', 'weight', 'enabled', 'prices']
+
     String number
     String name
     String displayName
@@ -38,8 +40,8 @@ class CrmProduct {
 
     static constraints = {
         number(maxSize: 40, blank: false, unique: 'tenantId')
-        name(maxSize: 80, blank: false)
-        displayName(maxSize: 80, nullable: true)
+        name(maxSize: 255, blank: false)
+        displayName(maxSize: 255, nullable: true)
         description(maxSize: 2000, nullable: true, widget: 'textarea')
         supplier(nullable: true)
         suppliersNumber(maxSize: 40, nullable: true)
@@ -53,7 +55,20 @@ class CrmProduct {
         sort "number"
     }
 
-    public static final List BIND_WHITELIST = ['number','name','displayName','description','supplier','suppliersNumber','group','barcode','customsCode','weight','enabled']
+    static transients = ['price', 'vat']
+
+    static taggable = true
+    static attachmentable = true
+    static dynamicProperties = true
+    static relatable = true
+
+    transient Float getPrice(CrmPriceList priceList = null) {
+        prices?.find {priceList ? it.priceList == priceList : true}?.outPrice
+    }
+
+    transient Float getVat(CrmPriceList priceList = null) {
+        prices?.find {priceList ? it.priceList == priceList : true}?.vat
+    }
 
     String toString() {
         name

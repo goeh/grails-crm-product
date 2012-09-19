@@ -15,48 +15,35 @@ grails.project.dependency.resolution = {
     log "warn" // log level of Ivy resolver, either 'error', 'warn', 'info', 'debug' or 'verbose'
     repositories {
         grailsCentral()
-        // uncomment the below to enable remote dependency resolution
-        // from public Maven repositories
         //mavenCentral()
-        //mavenLocal()
         mavenRepo "http://labs.technipelago.se/repo/plugins-releases-local/"
         mavenRepo "http://labs.technipelago.se/repo/crm-releases-local/"
-        //mavenRepo "http://snapshots.repository.codehaus.org"
-        //mavenRepo "http://repository.codehaus.org"
-        //mavenRepo "http://download.java.net/maven/2/"
-        //mavenRepo "http://repository.jboss.com/maven2/"
     }
     dependencies {
-        // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
-
-        // runtime 'mysql:mysql-connector-java:5.1.5'
     }
 
     plugins {
-        runtime ":hibernate:$grailsVersion"
         build(":tomcat:$grailsVersion",
-                ":release:2.0.3") {
+                ":rest-client-builder:1.0.2",
+                ":release:2.0.4") {
             export = false
         }
-        compile ":selection:latest.integration"
-        test ':codenarc:latest.integration'
-        test ":spock:0.6"
+        runtime ":hibernate:$grailsVersion"
 
-        runtime ":jquery:1.7.1"
-        runtime(":twitter-bootstrap:2.0.2.24") {
-            excludes 'resources'
-        }
-        runtime ":resources:1.1.6"
-        runtime ":selection-repository:latest.integration"
+        test(":codenarc:latest.integration") { export = false }
+        test(":spock:0.6") { export = false }
+
+        compile ":rendering:0.4.3"
 
         compile "grails.crm:crm-core:latest.integration"
-        //compile "grails.crm:crm-contact-lite:latest.integration"
-        runtime "grails.crm:crm-tags:latest.integration"
+        compile "grails.crm:crm-contact-lite:latest.integration"
         runtime "grails.crm:crm-ui-bootstrap:latest.integration"
+        runtime "grails.crm:crm-tags:latest.integration"
+
+        compile ":selection:latest.integration"
+        runtime ":selection-repository:latest.integration"
     }
 }
-
-grails.plugin.location.'crm-contact-lite'="../crm-contact-lite"
 
 codenarc {
     reports = {

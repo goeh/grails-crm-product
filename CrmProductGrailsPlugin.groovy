@@ -2,14 +2,16 @@ class CrmProductGrailsPlugin {
     // Dependency group
     def groupId = "grails.crm"
     // the plugin version
-    def version = "0.9.0"
+    def version = "1.0-SNAPSHOT"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "2.0 > *"
     // the other plugins this plugin depends on
     def dependsOn = [:]
     // resources that are excluded from plugin packaging
     def pluginExcludes = [
-        "grails-app/views/error.gsp"
+            "grails-app/conf/ApplicationResources.groovy",
+            "grails-app/services/grails/plugins/crm/product/TestSecurityService.groovy",
+            "grails-app/views/error.gsp"
     ]
 
     def title = "Grails CRM Product Plugin"
@@ -22,38 +24,20 @@ Provides product/item management for orders and sales projects, etc.
     // URL to the plugin's documentation
     def documentation = "http://grails.org/plugin/crm-product"
     def license = "APACHE"
-    def organization = [ name: "Technipelago AB", url: "http://www.technipelago.se/" ]
-    def issueManagement = [ system: "github", url: "https://github.com/goeh/grails-crm-product/issues" ]
-    def scm = [ url: "https://github.com/goeh/grails-crm-product" ]
+    def organization = [name: "Technipelago AB", url: "http://www.technipelago.se/"]
+    def issueManagement = [system: "github", url: "https://github.com/goeh/grails-crm-product/issues"]
+    def scm = [url: "https://github.com/goeh/grails-crm-product"]
 
-    def doWithWebDescriptor = { xml ->
-        // TODO Implement additions to web.xml (optional), this event occurs before
-    }
-
-    def doWithSpring = {
-        // TODO Implement runtime spring config (optional)
-    }
-
-    def doWithDynamicMethods = { ctx ->
-        // TODO Implement registering dynamic methods to classes (optional)
-    }
-
-    def doWithApplicationContext = { applicationContext ->
-        // TODO Implement post initialization spring config (optional)
-    }
-
-    def onChange = { event ->
-        // TODO Implement code that is executed when any artefact that this plugin is
-        // watching is modified and reloaded. The event contains: event.source,
-        // event.application, event.manager, event.ctx, and event.plugin.
-    }
-
-    def onConfigChange = { event ->
-        // TODO Implement code that is executed when the project configuration changes.
-        // The event is the same as for 'onChange'.
-    }
-
-    def onShutdown = { event ->
-        // TODO Implement code that is executed when the application shuts down (optional)
+    def features = {
+        crmProduct {
+            description "Product Catalogue"
+            link controller: "crmProduct", action: "index"
+            permissions {
+                guest "crmProduct:index,list,show"
+                user "crmProduct:*"
+                admin "crmProduct,crmProductGroup,crmPriceList:*"
+            }
+            hidden true
+        }
     }
 }

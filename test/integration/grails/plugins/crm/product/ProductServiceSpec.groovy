@@ -29,23 +29,23 @@ class ProductServiceSpec extends grails.plugin.spock.IntegrationSpec {
     @Shared mac
 
     def setup() {
-        pc = crmProductService.createProductGroup(name: "PC", param: "pc").save(failOnError: true, flush: true)
-        mac = crmProductService.createProductGroup(name: "Mac", param: "mac").save(failOnError: true, flush: true)
+        pc = crmProductService.createProductGroup(name: "PC", true)
+        mac = crmProductService.createProductGroup(name: "Mac", true)
     }
 
     def "create product and make sure it got created"() {
 
-        when:
+        when: "create a product, but don't set group yet"
         def p = crmProductService.createProduct(number:"mbp13", name:"MacBook Pro 13\"")
 
-        then:
+        then: "product group is missing"
         p.validate() == false
         p.errors.getFieldError("group").code == "nullable"
 
-        when:
+        when: "set group"
         p.group = mac
 
-        then:
+        then: "validate passes"
         p.validate()
 
         when:
