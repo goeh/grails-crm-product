@@ -37,7 +37,9 @@ grails.project.dependency.resolution = {
 
         compile "grails.crm:crm-core:latest.integration"
         compile "grails.crm:crm-contact-lite:latest.integration"
+        runtime "grails.crm:crm-security:latest.integration"
         runtime "grails.crm:crm-ui-bootstrap:latest.integration"
+        runtime "grails.crm:crm-i18n:latest.integration"
         runtime "grails.crm:crm-tags:latest.integration"
 
         compile ":selection:latest.integration"

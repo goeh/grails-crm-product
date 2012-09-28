@@ -10,7 +10,7 @@ class CrmProductGrailsPlugin {
     // resources that are excluded from plugin packaging
     def pluginExcludes = [
             "grails-app/conf/ApplicationResources.groovy",
-            "grails-app/services/grails/plugins/crm/product/TestSecurityService.groovy",
+            "src/groovy/grails/plugins/crm/product/TestSecurityDelegate.groovy",
             "grails-app/views/error.gsp"
     ]
 
