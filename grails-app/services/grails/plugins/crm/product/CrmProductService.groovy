@@ -174,4 +174,35 @@ class CrmProductService {
     def deletePriceList(CrmPriceList priceList) {
         priceList.delete()
     }
+
+    /**
+     * Return price for a product.
+     *
+     * @param productNumber CrmProduct.number
+     * @param amount amount to base price on
+     * @param priceList CrmPriceList instance or CrmPriceList.param string
+     * @return outPrice for the product, or null if no price are found
+     */
+    Float getPrice(String productNumber, Integer amount = null, Object priceList = null) {
+        def crmProduct = CrmProduct.findByNumber(productNumber, [cache: true])
+        if (!crmProduct) {
+            return null
+            //throw new IllegalArgumentException("CrmProduct not found: " + productNumber)
+        }
+        if (!(priceList instanceof CrmPriceList)) {
+            priceList = CrmPriceList.findByParam(priceList.toString())
+        }
+        if (!amount) {
+            amount = 1
+        }
+        if (crmProduct.prices) {
+            // Sort by descending fromAmount to find the best matching price
+            for (p in crmProduct.prices.findAll {priceList ? it.priceList == priceList : true}.sort {it.fromAmount}.reverse()) {
+                if (p.fromAmount == null || p.fromAmount <= amount) {
+                    return p.outPrice
+                }
+            }
+        }
+        return null
+    }
 }

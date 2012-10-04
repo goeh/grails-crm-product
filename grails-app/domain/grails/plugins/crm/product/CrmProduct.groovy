@@ -36,7 +36,8 @@ class CrmProduct {
     Float weight // TODO should weight be in CrmProductPrice instead?
     boolean enabled
 
-    static hasMany = [prices: CrmProductPrice]
+    static hasMany = [prices: CrmProductPrice, compositions: CrmProductComposition]
+    static mappedBy = [compositions: 'mainProduct']
 
     static constraints = {
         number(maxSize: 40, blank: false, unique: 'tenantId')
@@ -53,6 +54,7 @@ class CrmProduct {
 
     static mapping = {
         sort "number"
+        prices sort: 'fromAmount', 'asc'
     }
 
     static transients = ['price', 'vat']
