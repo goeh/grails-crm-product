@@ -16,7 +16,6 @@
 
 package grails.plugins.crm.product
 
-import grails.plugins.crm.contact.CrmContact
 import grails.plugins.crm.core.TenantEntity
 
 @TenantEntity
@@ -24,11 +23,13 @@ class CrmProduct {
 
     public static final List BIND_WHITELIST = ['number', 'name', 'displayName', 'description', 'supplier', 'suppliersNumber', 'group', 'barcode', 'customsCode', 'weight', 'enabled', 'prices']
 
+    def crmCoreService
+
     String number
     String name
     String displayName
     String description
-    CrmContact supplier
+    String supplierRef
     String suppliersNumber
     CrmProductGroup group
     String barcode
@@ -44,7 +45,7 @@ class CrmProduct {
         name(maxSize: 255, blank: false)
         displayName(maxSize: 255, nullable: true)
         description(maxSize: 2000, nullable: true, widget: 'textarea')
-        supplier(nullable: true)
+        supplierRef(maxSize: 80, nullable: true)
         suppliersNumber(maxSize: 40, nullable: true)
         group()
         barcode(maxSize: 255, nullable: true)
@@ -57,7 +58,7 @@ class CrmProduct {
         prices sort: 'fromAmount', 'asc'
     }
 
-    static transients = ['price', 'vat']
+    static transients = ['price', 'vat', 'supplier', 'includes', 'excludes', 'depends']
 
     static taggable = true
     static attachmentable = true
@@ -65,11 +66,79 @@ class CrmProduct {
     static relatable = true
 
     transient Float getPrice(CrmPriceList priceList = null) {
-        prices?.find {priceList ? it.priceList == priceList : true}?.outPrice
+        prices?.find { priceList ? it.priceList == priceList : true }?.outPrice
     }
 
     transient Float getVat(CrmPriceList priceList = null) {
-        prices?.find {priceList ? it.priceList == priceList : true}?.vat
+        prices?.find { priceList ? it.priceList == priceList : true }?.vat
+    }
+
+    transient Object getSupplier() {
+        crmCoreService.getReference(supplierRef)
+    }
+
+    transient void setSupplier(Object arg) {
+        supplierRef = crmCoreService.getReferenceIdentifier(arg)
+    }
+
+    transient List<CrmProduct> getIncludes() {
+        def result = []
+        for (c in compositions) {
+            if (c.type == CrmProductComposition.INCLUDES) {
+                result << c.product
+            }
+        }
+        return result
+    }
+
+    def addIncludes(CrmProduct included, Float quantity = null) {
+        if (included == this) {
+            throw new IllegalArgumentException("self reference")
+        }
+        if (!compositions?.find { it.product == included }) {
+            addToCompositions(product: included, quantity: quantity, type: CrmProductComposition.INCLUDES)
+        }
+        return this
+    }
+
+    transient List<CrmProduct> getExcludes() {
+        def result = []
+        for (c in compositions) {
+            if (c.type == CrmProductComposition.EXCLUDES) {
+                result << c.product
+            }
+        }
+        return result
+    }
+
+    def addExcludes(CrmProduct excluded, Float quantity = null) {
+        if (excluded == this) {
+            throw new IllegalArgumentException("self reference")
+        }
+        if (!compositions?.find { it.product == excluded }) {
+            addToCompositions(product: excluded, quantity: quantity, type: CrmProductComposition.EXCLUDES)
+        }
+        return this
+    }
+
+    transient List<CrmProduct> getDepends() {
+        def result = []
+        for (c in compositions) {
+            if (c.type == CrmProductComposition.DEPENDS) {
+                result << c.product
+            }
+        }
+        return result
+    }
+
+    def addDepends(CrmProduct dependedOn, Float quantity = null) {
+        if (dependedOn == this) {
+            throw new IllegalArgumentException("self reference")
+        }
+        if (!compositions?.find { it.product == dependedOn }) {
+            addToCompositions(product: dependedOn, quantity: quantity, type: CrmProductComposition.DEPENDS)
+        }
+        return this
     }
 
     String toString() {

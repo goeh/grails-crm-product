@@ -12,12 +12,12 @@ grails.project.dependency.resolution = {
         // uncomment to disable ehcache
         // excludes 'ehcache'
     }
-    log "warn" // log level of Ivy resolver, either 'error', 'warn', 'info', 'debug' or 'verbose'
+    log "warn"
     repositories {
-        grailsCentral()
-        //mavenCentral()
-        mavenRepo "http://labs.technipelago.se/repo/plugins-releases-local/"
+        grailsHome()
         mavenRepo "http://labs.technipelago.se/repo/crm-releases-local/"
+        mavenRepo "http://labs.technipelago.se/repo/plugins-releases-local/"
+        grailsCentral()
     }
     dependencies {
     }
@@ -30,14 +30,11 @@ grails.project.dependency.resolution = {
         }
         runtime ":hibernate:$grailsVersion"
 
-        test(":codenarc:latest.integration") { export = false }
-        test(":spock:0.6") { export = false }
-
-        compile ":rendering:0.4.3"
+        test(":codenarc:0.17") { export = false }
+        test(":spock:0.7") { export = false }
 
         compile "grails.crm:crm-core:latest.integration"
-        compile "grails.crm:crm-contact-lite:latest.integration"
-        runtime "grails.crm:crm-security:latest.integration"
+        //runtime "grails.crm:crm-security:latest.integration"
         runtime "grails.crm:crm-ui-bootstrap:latest.integration"
         runtime "grails.crm:crm-i18n:latest.integration"
         runtime "grails.crm:crm-tags:latest.integration"

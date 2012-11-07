@@ -73,7 +73,7 @@
 
                         <div class="span3">
                             <div class="row-fluid">
-                                <f:field property="supplier" input-class="span12"/>
+                                <f:field property="supplierRef" input-class="span12"/>
                                 <f:field property="suppliersNumber" input-class="span6"/>
                                 <f:field property="group" input-class="span12"/>
                             </div>

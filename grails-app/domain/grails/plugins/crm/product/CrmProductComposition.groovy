@@ -13,11 +13,13 @@ class CrmProductComposition {
     public static final int OPTION = 4
 
     CrmProduct product
+    Float quantity
     int type
 
     static belongsTo = [mainProduct: CrmProduct]
 
     static constraints = {
+        quantity(nullable: true)
         type(inList: [EXCLUDES, INCLUDES, DEPENDS, EQUIVALENT, REPLACES, OPTION])
     }
 

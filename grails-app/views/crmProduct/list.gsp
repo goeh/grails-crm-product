@@ -18,16 +18,16 @@
             <thead>
             <tr>
                 <crm:sortableColumn property="number"
-                                  title="${message(code: 'crmProduct.number.label', default: 'Number')}"/>
+                                    title="${message(code: 'crmProduct.number.label', default: 'Number')}"/>
 
                 <crm:sortableColumn property="name"
-                                  title="${message(code: 'crmProduct.name.label', default: 'Name')}"/>
+                                    title="${message(code: 'crmProduct.name.label', default: 'Name')}"/>
 
                 <crm:sortableColumn property="group.orderIndex"
-                                  title="${message(code: 'crmProduct.group.label', default: 'Group')}"/>
+                                    title="${message(code: 'crmProduct.group.label', default: 'Group')}"/>
 
-                <crm:sortableColumn property="suppler.name"
-                                  title="${message(code: 'crmProduct.supplier.label', default: 'Supplier')}"/>
+                <crm:sortableColumn property="supplierRef"
+                                    title="${message(code: 'crmProduct.supplier.label', default: 'Supplier')}"/>
             </tr>
             </thead>
             <tbody>
@@ -51,7 +51,14 @@
                     </td>
 
                     <td>
-                        <g:link controller="crmContact" action="show" id="${crmProduct.supplier?.id}">${fieldValue(bean: crmProduct, field: "supplier")}</g:link>
+                        <g:set var="supplier" value="${crmProduct.supplier}"/>
+                        <g:if test="${crmProduct.supplierRef?.startsWith('crmContact@')}">
+                            <g:link controller="crmContact" action="show"
+                                    id="${supplier?.id}">${supplier?.encodeAsHTML()}</g:link>
+                        </g:if>
+                        <g:else>
+                            ${supplier?.encodeAsHTML()}
+                        </g:else>
                     </td>
 
                 </tr>

@@ -27,11 +27,13 @@ class ProductServiceSpec extends grails.plugin.spock.IntegrationSpec {
 
     @Shared pc
     @Shared mac
+    @Shared foo
     @Shared priceList
 
     def setup() {
         pc = crmProductService.createProductGroup(name: "PC", true)
         mac = crmProductService.createProductGroup(name: "Mac", true)
+        foo = crmProductService.createProductGroup(name: "Foo", true)
 
         priceList = crmProductService.createPriceList(param: 'b2b', name: 'Small Businesses', true)
     }
@@ -67,12 +69,12 @@ class ProductServiceSpec extends grails.plugin.spock.IntegrationSpec {
         crmProductService.listProducts([number: "mbp"], [:]).size() == 2
 
         when:
-        p = crmProductService.listProducts([number: "mbp"], [sort: 'number', order: 'desc']).find {it}
+        p = crmProductService.listProducts([number: "mbp"], [sort: 'number', order: 'desc']).find { it }
         crmProductService.deleteProduct(p)
 
         then:
         crmProductService.listProducts([number: "mbp"], [:]).size() == 1
-        crmProductService.listProducts([number: "mbp"], [:]).find {it}.name == "MacBook Pro 13\""
+        crmProductService.listProducts([number: "mbp"], [:]).find { it }.name == "MacBook Pro 13\""
     }
 
     def "test multiple price lists"() {
@@ -91,6 +93,35 @@ class ProductServiceSpec extends grails.plugin.spock.IntegrationSpec {
         crmProductService.getPrice("dellxps15", 15) == 1199.99f
         crmProductService.getPrice("dellxps15", 50) == 1199.99f
         crmProductService.getPrice("dellxps15", 150) == 999.99f
+    }
 
+    def "composition includes"() {
+        given:
+        def wheel = crmProductService.createProduct(number: "wheel", name: "Wheel", group: foo, true)
+        def engine = crmProductService.createProduct(number: "engine", name: "Engine", group: foo, true)
+        def car = crmProductService.createProduct(number: "car", name: "Car", group: foo)
+        car.addIncludes(wheel, 4).addIncludes(engine, 1)
+
+        expect:
+        car.getIncludes().contains(wheel)
+        car.getIncludes().contains(engine)
+    }
+
+    def "composition excludes"() {
+        given:
+        def gold = crmProductService.createProduct(number: "gold", name: "Gold level", group: foo, true)
+        def silver = crmProductService.createProduct(number: "silver", name: "Silver level", group: foo, true)
+        def bronse = crmProductService.createProduct(number: "bronse", name: "Bronse level", group: foo, true)
+        gold.addExcludes(silver).addExcludes(bronse)
+        silver.addExcludes(gold).addExcludes(bronse)
+        bronse.addExcludes(gold).addExcludes(silver)
+
+        expect:
+        gold.getExcludes().contains(silver)
+        gold.getExcludes().contains(bronse)
+        silver.getExcludes().contains(gold)
+        silver.getExcludes().contains(bronse)
+        bronse.getExcludes().contains(gold)
+        bronse.getExcludes().contains(silver)
     }
 }

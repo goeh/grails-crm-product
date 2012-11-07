@@ -109,6 +109,25 @@
                         </div>
                     </div>
 
+                    <div class="form-actions btn-toolbar">
+                        <g:form>
+                            <g:hiddenField name="id" value="${crmProduct?.id}"/>
+
+                            <crm:button type="link" action="edit" id="${crmProduct?.id}" visual="primary"
+                                        icon="icon-pencil icon-white"
+                                        label="crmProduct.button.edit.label" permission="crmProduct:edit">
+                            </crm:button>
+
+                            <crm:button type="link" group="true" action="create"
+                                        params="${['group.id': crmProduct.group?.id]}"
+                                        visual="success"
+                                        icon="icon-file icon-white"
+                                        label="crmProduct.button.create.label"
+                                        title="crmProduct.button.create.help"
+                                        permission="crmProduct:create"/>
+                        </g:form>
+                    </div>
+
                 </div>
 
                 <div class="tab-pane" id="prices">
@@ -122,26 +141,6 @@
                 </crm:pluginViews>
             </div>
 
-        </div>
-
-
-        <div class="form-actions btn-toolbar">
-            <g:form>
-                <g:hiddenField name="id" value="${crmProduct?.id}"/>
-
-                <crm:button type="link" action="edit" id="${crmProduct?.id}" visual="primary"
-                            icon="icon-pencil icon-white"
-                            label="crmProduct.button.edit.label" permission="crmProduct:edit">
-                </crm:button>
-
-                <crm:button type="link" group="true" action="create"
-                            params="${['group.id': crmProduct.group?.id]}"
-                            visual="success"
-                            icon="icon-file icon-white"
-                            label="crmProduct.button.create.label"
-                            title="crmProduct.button.create.help"
-                            permission="crmProduct:create"/>
-            </g:form>
         </div>
 
     </div>

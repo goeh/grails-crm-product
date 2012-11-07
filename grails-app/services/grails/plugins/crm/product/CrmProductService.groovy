@@ -74,7 +74,19 @@ class CrmProductService {
             if (query.name) {
                 ilike('name', SearchUtils.wildcard(query.name))
             }
+            if (query.supplier) {
+                ilike('supplierRef', SearchUtils.wildcard(query.supplier))
+            }
+            if (query.productGroup) {
+                group {
+                    ilike('name', SearchUtils.wildcard(query.productGroup))
+                }
+            }
         }
+    }
+
+    CrmProduct getProduct(String number) {
+        CrmProduct.findByNumberAndTenantId(number, TenantUtils.tenant)
     }
 
     CrmProduct createProduct(Map params, boolean save = false) {
@@ -197,7 +209,7 @@ class CrmProductService {
         }
         if (crmProduct.prices) {
             // Sort by descending fromAmount to find the best matching price
-            for (p in crmProduct.prices.findAll {priceList ? it.priceList == priceList : true}.sort {it.fromAmount}.reverse()) {
+            for (p in crmProduct.prices.findAll { priceList ? it.priceList == priceList : true }.sort { it.fromAmount }.reverse()) {
                 if (p.fromAmount == null || p.fromAmount <= amount) {
                     return p.outPrice
                 }
