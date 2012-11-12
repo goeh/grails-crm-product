@@ -48,7 +48,7 @@
             <li><a href="#prices" data-toggle="tab"><g:message code="crmProduct.tab.prices.label"/><crm:countIndicator
                     count="${crmProduct.prices.size()}"/></a></li>
             <crm:pluginViews location="tabs" var="view">
-        <crm:pluginTab id="${view.id}" label="${view.label}" count="${view.model?.totalCount}"/>
+                <crm:pluginTab id="${view.id}" label="${view.label}" count="${view.model?.totalCount}"/>
             </crm:pluginViews>
         </ul>
 
@@ -64,10 +64,6 @@
                                 <f:field property="number" input-autofocus="" input-class="span12"/>
                                 <f:field property="name" input-class="span12"/>
                                 <f:field property="displayName" input-class="span12"/>
-                                <f:field property="description">
-                                    <g:textArea name="description" value="${crmProduct.description}" rows="4" cols="50"
-                                                class="span12"/>
-                                </f:field>
                             </div>
                         </div>
 
@@ -82,13 +78,27 @@
                         <div class="span3">
                             <div class="row-fluid">
                                 <f:field property="barcode" input-class="span12"/>
-                                <f:field property="customsCode" input-class="span12"/>
-                                <f:field property="weight" input-class="span6"
-                                         input-min="-999999" input-max="999999" input-step="0.01"/>
-                                <f:field property="enabled"/>
+                                <f:field property="customsCode" input-class="span6"/>
+                                <f:field property="weight">
+                                    <g:textField name="weight" value="${formatNumber(number: crmProduct.weight)}"
+                                                 class="span6"/>
+                                </f:field>
                             </div>
                         </div>
 
+                    </div>
+
+                    <div class="row-fluid">
+                        <div class="span6">
+                            <f:field property="description">
+                                <g:textArea name="description" value="${crmProduct.description}" rows="4" cols="50"
+                                            class="span12"/>
+                            </f:field>
+                        </div>
+
+                        <div class="span3">
+                            <f:field property="enabled"/>
+                        </div>
                     </div>
 
                 </f:with>
@@ -124,14 +134,13 @@
                     </tfoot>
                 </table>
 
-
             </div>
 
-<crm:pluginViews location="tabs" var="view">
-    <div class="tab-pane tab-${view.id}" id="${view.id}">
-        <g:render template="${view.template}" model="${view.model}" plugin="${view.plugin}"/>
-    </div>
-</crm:pluginViews>
+            <crm:pluginViews location="tabs" var="view">
+                <div class="tab-pane tab-${view.id}" id="${view.id}">
+                    <g:render template="${view.template}" model="${view.model}" plugin="${view.plugin}"/>
+                </div>
+            </crm:pluginViews>
         </div>
     </div>
 
