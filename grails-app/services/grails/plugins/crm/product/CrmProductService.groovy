@@ -37,6 +37,31 @@ class CrmProductService {
         }
     }
 
+    @Listener(namespace = "crmTenant", topic = "requestDelete")
+    def requestDeleteTenant(event) {
+        def tenant = event.id
+        def count = 0
+        count += CrmProduct.countByTenantId(tenant)
+        count += CrmProductGroup.countByTenantId(tenant)
+        count += CrmPriceList.countByTenantId(tenant)
+        count ? [namespace: 'crmProduct', topic: 'deleteTenant'] : null
+    }
+
+    @Listener(namespace = "crmProduct", topic = "deleteTenant")
+    def deleteTenant(event) {
+        def tenant = event.id
+        CrmProductComposition.createCriteria().list() {
+            mainProduct {
+                eq('tenantId', tenant)
+            }
+        }*.delete()
+        def result = CrmProduct.findAllByTenantId(tenant)
+        result*.delete()
+        CrmProductGroup.findAllByTenantId(tenant)*.delete()
+        CrmPriceList.findAllByTenantId(tenant)*.delete()
+        log.warn("Deleted ${result.size()} products in tenant $tenant")
+    }
+
     /**
      * Empty query = search all records.
      *
