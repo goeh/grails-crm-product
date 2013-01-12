@@ -16,20 +16,21 @@
 
 package grails.plugins.crm.product
 
-import grails.plugins.crm.core.WebUtils
+import grails.plugins.crm.contact.CrmContact
 import org.springframework.dao.DataIntegrityViolationException
+import grails.converters.JSON
+import grails.plugins.crm.core.WebUtils
 import grails.plugins.crm.core.TenantUtils
 
 class CrmProductController {
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
+    def crmCoreService
+    def crmSecurityService
+    def selectionService
     def crmProductService
     def crmContactService
-    def selectionService
-    def userTagService
-    def crmSecurityService
-    def shiroCrmSecurityService // TODO reference to Shiro Security!!!
 
     def index() {
         // If any query parameters are specified in the URL, let them override the last query stored in session.
@@ -99,6 +100,15 @@ class CrmProductController {
             case "GET":
                 return [crmProduct: crmProduct]
             case "POST":
+                def company = getCompany(params.supplier)
+                if (company) {
+                    params.supplierRef = crmCoreService.getReferenceIdentifier(company)
+                } else {
+                    params.supplierRef = null
+                }
+
+                bindData(crmProduct, params, [include: CrmProduct.BIND_WHITELIST])
+
                 if (crmProduct.hasErrors() || !crmProduct.save()) {
                     render(view: "create", model: [crmProduct: crmProduct])
                     return
@@ -148,20 +158,38 @@ class CrmProductController {
                     }
                 }
 
-                println "before bindData: ${crmProduct.prices*.vat}"
+                def company = getCompany(params.supplier)
+                if (company) {
+                    params.supplierRef = crmCoreService.getReferenceIdentifier(company)
+                } else {
+                    params.supplierRef = null
+                }
 
                 bindData(crmProduct, params, [include: CrmProduct.BIND_WHITELIST])
 
-                println "after bindData: ${crmProduct.prices*.vat}"
                 if (!crmProduct.save(flush: true)) {
                     render(view: "edit", model: [crmProduct: crmProduct, vatList: getVatList()])
                     return
                 }
 
-                flash.success = message(code: 'crmProduct.updated.message', args: [message(code: 'crmProduct.label', default: 'Product'), crmProduct.id])
+                flash.success = message(code: 'crmProduct.updated.message', args: [message(code: 'crmProduct.label', default: 'Product'), crmProduct.toString()])
                 redirect(action: "show", id: crmProduct.id)
                 break
         }
+    }
+
+    private CrmContact getCompany(String name) {
+        if(!name) {
+            return null
+        }
+        def company = crmContactService.findByName(name)
+
+        // A company name is specified but it's not an existing company, create a new company.
+        if (!company) {
+            company = crmContactService.createCompany(name: name).save(failOnError: true, flush: true)
+        }
+
+        return company
     }
 
     def delete(Long id) {
@@ -187,5 +215,11 @@ class CrmProductController {
     def addPrice() {
         def crmProduct = params.id ? CrmProduct.get(params.id) : null
         render template: 'price', model: [row: 0, bean: new CrmProductPrice(product: crmProduct, fromAmount: 1, inPrice: 0, outPrice: 0, vat: 0.25), vatList: getVatList()]
+    }
+
+    def autocompleteSupplier() {
+        def result = crmContactService.list([name: params.q], [max: 100]).collect { [it.name, it.id] }
+        WebUtils.noCache(response)
+        render result as JSON
     }
 }

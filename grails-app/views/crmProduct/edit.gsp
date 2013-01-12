@@ -1,13 +1,26 @@
-<%@ page import="grails.plugins.crm.core.TenantUtils; grails.plugins.crm.product.CrmProduct; grails.plugins.crm.product.CrmPriceList" %>
 <!DOCTYPE html>
 <html>
 <head>
     <meta name="layout" content="main">
     <g:set var="entityName" value="${message(code: 'crmProduct.label', default: 'Product')}"/>
     <title><g:message code="crmProduct.edit.title" args="[entityName, crmProduct]"/></title>
-    <r:require modules="select2"/>
+    <r:require modules="autocomplete"/>
     <r:script>
         $(document).ready(function () {
+            // Supplier.
+            $("input[name='supplier']").autocomplete("${createLink(action: 'autocompleteSupplier')}", {
+                remoteDataType: 'json',
+                preventDefaultReturn: true,
+                selectFirst: true,
+                onItemSelect: function(item) {
+                    var id = item.data[0];
+                    $("header h1 small").text(item.value);
+                },
+                onNoMatch: function() {
+                    $("header h1 small").text($("input[name='supplier']").val());
+                }
+            });
+
             $("#btn-add-price").click(function(ev) {
                 $.get("${createLink(action: 'addPrice', id: crmProduct.id)}", function(html) {
                     var table = $("#price-list");
@@ -69,7 +82,10 @@
 
                         <div class="span3">
                             <div class="row-fluid">
-                                <f:field property="supplierRef" input-class="span12"/>
+                                <f:field property="supplier">
+                                    <g:textField name="supplier" value="${crmProduct.supplier?.name}" class="span12"
+                                                 autocomplete="off"/>
+                                </f:field>
                                 <f:field property="suppliersNumber" input-class="span6"/>
                                 <f:field property="group" input-class="span12"/>
                             </div>

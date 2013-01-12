@@ -21,7 +21,9 @@ import grails.plugins.crm.core.TenantEntity
 @TenantEntity
 class CrmProduct {
 
-    public static final List BIND_WHITELIST = ['number', 'name', 'displayName', 'description', 'supplier', 'suppliersNumber', 'group', 'barcode', 'customsCode', 'weight', 'enabled', 'prices']
+    public static final List BIND_WHITELIST = ['number', 'name', 'displayName', 'description',
+            'supplier', 'supplierRef', 'suppliersNumber',
+            'group', 'barcode', 'customsCode', 'weight', 'enabled', 'prices']
 
     def crmCoreService
 
@@ -58,12 +60,13 @@ class CrmProduct {
         prices sort: 'fromAmount', 'asc'
     }
 
-    static transients = ['price', 'vat', 'supplier', 'includes', 'excludes', 'depends']
+    static transients = ['supplier', 'price', 'vat', 'supplier', 'includes', 'excludes', 'depends']
 
     static taggable = true
     static attachmentable = true
     static dynamicProperties = true
     static relatable = true
+    static auditable = true
 
     transient Float getPrice(CrmPriceList priceList = null) {
         prices?.find { priceList ? it.priceList == priceList : true }?.outPrice
