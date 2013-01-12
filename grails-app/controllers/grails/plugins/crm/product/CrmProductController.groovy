@@ -16,7 +16,6 @@
 
 package grails.plugins.crm.product
 
-import grails.plugins.crm.contact.CrmContact
 import org.springframework.dao.DataIntegrityViolationException
 import grails.converters.JSON
 import grails.plugins.crm.core.WebUtils
@@ -178,8 +177,8 @@ class CrmProductController {
         }
     }
 
-    private CrmContact getCompany(String name) {
-        if(!name) {
+    private Object /*CrmContact*/ getCompany(String name) {
+        if (!name) {
             return null
         }
         def company = crmContactService.findByName(name)
