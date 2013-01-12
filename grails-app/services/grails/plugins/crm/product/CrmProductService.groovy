@@ -100,7 +100,9 @@ class CrmProductService {
                 ilike('name', SearchUtils.wildcard(query.name))
             }
             if (query.supplier) {
-                ilike('supplierRef', SearchUtils.wildcard(query.supplier))
+                supplier {
+                    ilike('name', SearchUtils.wildcard(query.supplier))
+                }
             }
             if (query.productGroup) {
                 group {

@@ -109,7 +109,7 @@
                         </div>
                     </div>
 
-                    <div class="form-actions btn-toolbar">
+                    <div class="form-actions">
                         <g:form>
                             <g:hiddenField name="id" value="${crmProduct?.id}"/>
 
@@ -118,7 +118,7 @@
                                         label="crmProduct.button.edit.label" permission="crmProduct:edit">
                             </crm:button>
 
-                            <crm:button type="link" group="true" action="create"
+                            <crm:button type="link" action="create"
                                         params="${['group.id': crmProduct.group?.id]}"
                                         visual="success"
                                         icon="icon-file icon-white"

@@ -26,7 +26,7 @@
                 <crm:sortableColumn property="group.orderIndex"
                                     title="${message(code: 'crmProduct.group.label', default: 'Group')}"/>
 
-                <crm:sortableColumn property="supplierRef"
+                <crm:sortableColumn property="supplier.name"
                                     title="${message(code: 'crmProduct.supplier.label', default: 'Supplier')}"/>
             </tr>
             </thead>
@@ -51,14 +51,8 @@
                     </td>
 
                     <td>
-                        <g:set var="supplier" value="${crmProduct.supplier}"/>
-                        <g:if test="${crmProduct.supplierRef?.startsWith('crmContact@')}">
-                            <g:link controller="crmContact" action="show"
-                                    id="${supplier?.id}">${supplier?.encodeAsHTML()}</g:link>
-                        </g:if>
-                        <g:else>
-                            ${supplier?.encodeAsHTML()}
-                        </g:else>
+                        <g:link controller="crmContact" action="show"
+                                id="${crmProduct.supplier?.id}">${crmProduct.supplier?.encodeAsHTML()}</g:link>
                     </td>
 
                 </tr>

@@ -20,12 +20,12 @@ import org.springframework.dao.DataIntegrityViolationException
 import grails.converters.JSON
 import grails.plugins.crm.core.WebUtils
 import grails.plugins.crm.core.TenantUtils
+import grails.plugins.crm.contact.CrmContact
 
 class CrmProductController {
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
 
-    def crmCoreService
     def crmSecurityService
     def selectionService
     def crmProductService
@@ -99,12 +99,7 @@ class CrmProductController {
             case "GET":
                 return [crmProduct: crmProduct]
             case "POST":
-                def company = getCompany(params.supplier)
-                if (company) {
-                    params.supplierRef = crmCoreService.getReferenceIdentifier(company)
-                } else {
-                    params.supplierRef = null
-                }
+                crmProduct.supplier = getCompany(params.remove('supplier'))
 
                 bindData(crmProduct, params, [include: CrmProduct.BIND_WHITELIST])
 
@@ -157,12 +152,7 @@ class CrmProductController {
                     }
                 }
 
-                def company = getCompany(params.supplier)
-                if (company) {
-                    params.supplierRef = crmCoreService.getReferenceIdentifier(company)
-                } else {
-                    params.supplierRef = null
-                }
+                crmProduct.supplier = getCompany(params.remove('supplier'))
 
                 bindData(crmProduct, params, [include: CrmProduct.BIND_WHITELIST])
 
@@ -177,7 +167,7 @@ class CrmProductController {
         }
     }
 
-    private Object /*CrmContact*/ getCompany(String name) {
+    private CrmContact getCompany(String name) {
         if (!name) {
             return null
         }

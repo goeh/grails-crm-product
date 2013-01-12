@@ -16,23 +16,21 @@
 
 package grails.plugins.crm.product
 
+import grails.plugins.crm.contact.CrmContact
 import grails.plugins.crm.core.TenantEntity
 
 @TenantEntity
 class CrmProduct {
 
     public static final List BIND_WHITELIST = ['number', 'name', 'displayName', 'description',
-            'supplier', 'supplierRef', 'suppliersNumber',
-            'group', 'barcode', 'customsCode', 'weight', 'enabled', 'prices']
-
-    def crmCoreService
+            'supplier', 'suppliersNumber', 'group', 'barcode', 'customsCode', 'weight', 'enabled', 'prices']
 
     String number
     String name
     String displayName
     String description
-    String supplierRef
     String suppliersNumber
+    CrmContact supplier
     CrmProductGroup group
     String barcode
     String customsCode
@@ -47,7 +45,7 @@ class CrmProduct {
         name(maxSize: 255, blank: false)
         displayName(maxSize: 255, nullable: true)
         description(maxSize: 2000, nullable: true, widget: 'textarea')
-        supplierRef(maxSize: 80, nullable: true)
+        supplier(nullable: true)
         suppliersNumber(maxSize: 40, nullable: true)
         group()
         barcode(maxSize: 255, nullable: true)
@@ -60,7 +58,7 @@ class CrmProduct {
         prices sort: 'fromAmount', 'asc'
     }
 
-    static transients = ['supplier', 'price', 'vat', 'supplier', 'includes', 'excludes', 'depends']
+    static transients = ['price', 'vat', 'includes', 'excludes', 'depends']
 
     static taggable = true
     static attachmentable = true
@@ -74,14 +72,6 @@ class CrmProduct {
 
     transient Float getVat(CrmPriceList priceList = null) {
         prices?.find { priceList ? it.priceList == priceList : true }?.vat
-    }
-
-    transient Object getSupplier() {
-        crmCoreService.getReference(supplierRef)
-    }
-
-    transient void setSupplier(Object arg) {
-        supplierRef = crmCoreService.getReferenceIdentifier(arg)
     }
 
     transient List<CrmProduct> getIncludes() {
