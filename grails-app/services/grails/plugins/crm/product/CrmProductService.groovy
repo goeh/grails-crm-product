@@ -106,7 +106,10 @@ class CrmProductService {
             }
             if (query.productGroup) {
                 group {
-                    ilike('name', SearchUtils.wildcard(query.productGroup))
+                    or {
+                        ilike('name', SearchUtils.wildcard(query.productGroup))
+                        eq('param', query.productGroup)
+                    }
                 }
             }
         }
