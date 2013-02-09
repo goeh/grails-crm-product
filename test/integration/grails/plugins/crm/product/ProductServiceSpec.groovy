@@ -28,12 +28,14 @@ class ProductServiceSpec extends grails.plugin.spock.IntegrationSpec {
     @Shared pc
     @Shared mac
     @Shared foo
+    @Shared car
     @Shared priceList
 
     def setup() {
         pc = crmProductService.createProductGroup(name: "PC", true)
         mac = crmProductService.createProductGroup(name: "Mac", true)
         foo = crmProductService.createProductGroup(name: "Foo", true)
+        car = crmProductService.createProductGroup(name: "Car", true)
 
         priceList = crmProductService.createPriceList(param: 'b2b', name: 'Small Businesses', true)
     }
@@ -77,15 +79,17 @@ class ProductServiceSpec extends grails.plugin.spock.IntegrationSpec {
         crmProductService.listProducts([number: "mbp"], [:]).find { it }.name == "MacBook Pro 13\""
     }
 
-    def "test multiple price lists"() {
+    def "test multiple prices"() {
+
+        given: "create a product"
+        def p = crmProductService.createProduct(number: "dellxps15", name: "Dell XPS 15\"", group: pc)
 
         when: "create a product with staggered prices"
-        def p = crmProductService.createProduct(number: "dellxps15", name: "Dell XPS 15\"", group: pc)
         p.addToPrices(priceList: priceList, unit: 'pcs', fromAmount: 1, inPrice: 0, outPrice: 1299.99, vat: 0.25)
         p.addToPrices(priceList: priceList, unit: 'pcs', fromAmount: 10, inPrice: 0, outPrice: 1199.99, vat: 0.25)
         p.addToPrices(priceList: priceList, unit: 'pcs', fromAmount: 100, inPrice: 0, outPrice: 999.99, vat: 0.25)
 
-        then: "save the product"
+        then: "check that we get correct prices"
         p.save(failOnError: true, flush: true)
         crmProductService.getPrice("dellxps15") == 1299.99f
         crmProductService.getPrice("dellxps15", 1) == 1299.99f
@@ -94,6 +98,52 @@ class ProductServiceSpec extends grails.plugin.spock.IntegrationSpec {
         crmProductService.getPrice("dellxps15", 50) == 1199.99f
         crmProductService.getPrice("dellxps15", 150) == 999.99f
     }
+
+    def "test multiple price lists"() {
+
+        given: "create one product and multiple price lists"
+        def priceList1 = crmProductService.createPriceList(param: 'a', name: 'A prices', true)
+        def priceList2 = crmProductService.createPriceList(param: 'b', name: 'B prices', true)
+        def priceList3 = crmProductService.createPriceList(param: 'c', name: 'C prices', true)
+        def p = crmProductService.createProduct(number: "v240", name: "Volvo 240 GL 1987", group: car)
+
+        when: "create a product with different price lists"
+        p.addToPrices(priceList: priceList1, unit: 'pcs', fromAmount: 1, inPrice: 0, outPrice: 9000, vat: 0.25)
+        p.addToPrices(priceList: priceList2, unit: 'pcs', fromAmount: 1, inPrice: 0, outPrice: 5000, vat: 0.25)
+        p.addToPrices(priceList: priceList3, unit: 'pcs', fromAmount: 1, inPrice: 0, outPrice: 2000, vat: 0.25)
+
+        then: "check that we get correct prices"
+        p.save(failOnError: true, flush: true)
+        crmProductService.getPrice("v240") == 9000f
+        crmProductService.getPrice("v240", 1, priceList1) == 9000f
+        crmProductService.getPrice("v240", 1, priceList2) == 5000f
+        crmProductService.getPrice("v240", 1, priceList3) == 2000f
+        p.getPrice(1, priceList1) == 9000f
+        p.getPrice(2, priceList2) == 5000f
+        p.getPrice(3, priceList3) == 2000f
+    }
+
+    def "test different prices by quantity and unit"() {
+
+            given: "create one product and multiple price lists"
+            def priceList1 = crmProductService.createPriceList(param: 'p', name: 'Private', true)
+            def priceList2 = crmProductService.createPriceList(param: 'biz', name: 'Business', true)
+            def p = crmProductService.createProduct(number: "meat", name: "Meat", group: foo)
+
+            when: "create a product with different price lists"
+            p.addToPrices(priceList: priceList1, unit: 'box', fromAmount: 1, inPrice: 0, outPrice: 499, vat: 0.25)
+            p.addToPrices(priceList: priceList1, unit: 'kg', fromAmount: 1, inPrice: 0, outPrice: 99, vat: 0.25)
+            p.addToPrices(priceList: priceList2, unit: 'box', fromAmount: 1, inPrice: 0, outPrice: 399, vat: 0.25)
+            p.addToPrices(priceList: priceList2, unit: 'kg', fromAmount: 1, inPrice: 0, outPrice: 79, vat: 0.25)
+
+            then: "check that we get correct prices"
+            p.save(failOnError: true, flush: true)
+            crmProductService.getPrice("meat") == 499
+            crmProductService.getPrice("meat", 1, priceList1) == 499
+            crmProductService.getPrice("meat", 1, priceList2) == 399
+            crmProductService.getPrice("meat", 1, priceList1, "kg") == 99
+            crmProductService.getPrice("meat", 1, priceList2, "kg") == 79
+        }
 
     def "composition includes"() {
         given:

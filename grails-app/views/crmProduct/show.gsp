@@ -131,7 +131,7 @@
                 </div>
 
                 <div class="tab-pane" id="prices">
-                    <g:render template="prices" model="${[result: crmProduct.prices]}"/>
+                    <g:render template="prices" model="${[result: prices]}"/>
                 </div>
 
                 <crm:pluginViews location="tabs" var="view">
@@ -148,6 +148,8 @@
     <div class="span3">
 
         <g:render template="/tags" plugin="crm-tags" model="${[bean: crmProduct]}"/>
+
+        <div id="resource-preview"></div>
 
     </div>
 </div>

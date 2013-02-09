@@ -72,7 +72,7 @@
 
                     <div class="row-fluid">
 
-                        <div class="span3">
+                        <div class="span4">
                             <div class="row-fluid">
                                 <f:field property="number" input-autofocus="" input-class="span12"/>
                                 <f:field property="name" input-class="span12"/>
@@ -80,7 +80,7 @@
                             </div>
                         </div>
 
-                        <div class="span3">
+                        <div class="span4">
                             <div class="row-fluid">
                                 <f:field property="supplier">
                                     <g:textField name="supplier" value="${crmProduct.supplier?.name}" class="span12"
@@ -91,9 +91,9 @@
                             </div>
                         </div>
 
-                        <div class="span3">
+                        <div class="span4">
                             <div class="row-fluid">
-                                <f:field property="barcode" input-class="span12"/>
+                                <f:field property="barcode" input-class="span6"/>
                                 <f:field property="customsCode" input-class="span6"/>
                                 <f:field property="weight">
                                     <g:textField name="weight" value="${formatNumber(number: crmProduct.weight)}"

@@ -40,4 +40,19 @@ Provides product/item management for orders and sales projects, etc.
             hidden true
         }
     }
+/*
+    def doWithApplicationContext = { applicationContext ->
+        def crmCoreService = applicationContext.crmCoreService
+        def crmPluginService = applicationContext.crmPluginService
+        def crmContentService = applicationContext.containsBean('crmContentService') ? applicationContext.crmContentService : null
+        if (crmContentService) {
+            crmPluginService.registerView('crmProduct', 'show', 'tabs',
+                    [id: "resources", index: 250, permission: "crmProduct:show", label: "Media", template: '/crmProduct/resources', plugin: "crm-product", model: {
+                        def result = crmContentService.findResourcesByReference(crmProduct, [sort: 'title', order: 'asc'])
+                        return [list: result, totalCount: result.totalCount, reference: crmCoreService.getReferenceIdentifier(crmProduct)]
+                    }]
+            )
+        }
+    }
+*/
 }

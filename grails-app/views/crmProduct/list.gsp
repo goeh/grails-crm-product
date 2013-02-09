@@ -4,6 +4,13 @@
     <meta name="layout" content="main">
     <g:set var="entityName" value="${message(code: 'crmProduct.label', default: 'Product')}"/>
     <title><g:message code="crmProduct.list.title" args="[entityName]"/></title>
+    <style type="text/css">
+    th.money,
+    td.money {
+        text-align: right;
+        padding-right: 20px;
+    }
+    </style>
 </head>
 
 <body>
@@ -27,10 +34,12 @@
 
         <crm:sortableColumn property="supplier.name"
                             title="${message(code: 'crmProduct.supplier.label', default: 'Supplier')}"/>
+        <th class="money"><g:message code="crmProduct.price.label" default="Price"/></th>
     </tr>
     </thead>
     <tbody>
     <g:each in="${crmProductList}" var="crmProduct">
+        <g:set var="price" value="${crmProduct.getProductPrice()}"/>
         <tr>
 
             <td>
@@ -52,6 +61,11 @@
             <td>
                 <g:link controller="crmContact" action="show"
                         id="${crmProduct.supplier?.id}">${crmProduct.supplier?.encodeAsHTML()}</g:link>
+            </td>
+            <td class="money">
+                <g:formatNumber number="${price.outPrice}"
+                                type="currency" currencyCode="${currency}"
+                                maxFractionDigits="2"/> / ${price.unit}
             </td>
 
         </tr>

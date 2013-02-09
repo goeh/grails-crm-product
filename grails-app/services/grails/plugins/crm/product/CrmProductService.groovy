@@ -97,12 +97,24 @@ class CrmProductService {
                 ilike('number', SearchUtils.wildcard(query.number))
             }
             if (query.name) {
-                ilike('name', SearchUtils.wildcard(query.name))
+                or {
+                    ilike('name', SearchUtils.wildcard(query.name))
+                    ilike('displayName', SearchUtils.wildcard(query.name))
+                }
             }
             if (query.supplier) {
                 supplier {
                     ilike('name', SearchUtils.wildcard(query.supplier))
                 }
+            }
+            if (query.suppliersNumber) {
+                ilike('suppliersNumber', SearchUtils.wildcard(query.suppliersNumber))
+            }
+            if (query.barcode) {
+                ilike('barcode', SearchUtils.wildcard(query.barcode))
+            }
+            if (query.customsCode) {
+                ilike('customsCode', SearchUtils.wildcard(query.customsCode))
             }
             if (query.productGroup) {
                 group {
@@ -110,6 +122,17 @@ class CrmProductService {
                         ilike('name', SearchUtils.wildcard(query.productGroup))
                         eq('param', query.productGroup)
                     }
+                }
+            }
+            if (query.enabled != null) {
+                eq('enabled', query.enabled)
+            }
+            if (query.weight != null) {
+                eq('weight', query.weight)
+            }
+            if (query.price != null) {
+                prices {
+                    eq('outPrice', query.price)
                 }
             }
         }
@@ -223,28 +246,10 @@ class CrmProductService {
      * @param productNumber CrmProduct.number
      * @param amount amount to base price on
      * @param priceList CrmPriceList instance or CrmPriceList.param string
+     * @param unit unit to get price for
      * @return outPrice for the product, or null if no price are found
      */
-    Float getPrice(String productNumber, Integer amount = null, Object priceList = null) {
-        def crmProduct = CrmProduct.findByNumber(productNumber, [cache: true])
-        if (!crmProduct) {
-            return null
-            //throw new IllegalArgumentException("CrmProduct not found: " + productNumber)
-        }
-        if (!(priceList instanceof CrmPriceList)) {
-            priceList = CrmPriceList.findByParam(priceList.toString())
-        }
-        if (!amount) {
-            amount = 1
-        }
-        if (crmProduct.prices) {
-            // Sort by descending fromAmount to find the best matching price
-            for (p in crmProduct.prices.findAll { priceList ? it.priceList == priceList : true }.sort { it.fromAmount }.reverse()) {
-                if (p.fromAmount == null || p.fromAmount <= amount) {
-                    return p.outPrice
-                }
-            }
-        }
-        return null
+    Float getPrice(String productNumber, Integer amount = null, Object priceList = null, String unit = null) {
+        CrmProduct.findByNumberAndTenantId(productNumber, TenantUtils.tenant, [cache: true])?.getPrice(amount, priceList, unit)
     }
 }

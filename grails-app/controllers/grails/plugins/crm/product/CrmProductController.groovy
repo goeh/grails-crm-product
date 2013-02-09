@@ -22,6 +22,8 @@ import grails.plugins.crm.core.WebUtils
 import grails.plugins.crm.core.TenantUtils
 import grails.plugins.crm.contact.CrmContact
 
+import javax.servlet.http.HttpServletResponse
+
 class CrmProductController {
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
@@ -30,6 +32,7 @@ class CrmProductController {
     def selectionService
     def crmProductService
     def crmContactService
+    def crmContentService
 
     def index() {
         // If any query parameters are specified in the URL, let them override the last query stored in session.
@@ -59,10 +62,10 @@ class CrmProductController {
         def result
         try {
             result = selectionService.select(uri, params)
-            [crmProductList: result, crmProductTotal: result.totalCount, selection: uri]
+            [crmProductList: result, crmProductTotal: result.totalCount, selection: uri, currency: "SEK"]
         } catch (Exception e) {
             flash.error = e.message
-            [crmProductList: [], crmProductTotal: 0, selection: uri]
+            [crmProductList: [], crmProductTotal: 0, selection: uri, currency: "SEK"] // TODO SEK!!!
         }
     }
 
@@ -122,9 +125,18 @@ class CrmProductController {
             return
         }
 
-        [crmProduct: crmProduct]
+        def prices = CrmProductPrice.createCriteria().list() {
+            eq('product', crmProduct)
+            priceList {
+                order 'orderIndex', 'asc'
+            }
+            order 'unit'
+            order 'fromAmount'
+        }
+        [crmProduct: crmProduct, prices: prices, currency: "SEK"] // TODO SEK!!!
     }
 
+    // TODO !!!!!!
     private List getVatList() {
         [0, 6, 12, 25].collect {
             [label: "${it}%", value: (it / 100).floatValue()]
@@ -152,6 +164,8 @@ class CrmProductController {
                     }
                 }
 
+                savePresentation(crmProduct, params.template)
+
                 crmProduct.supplier = getCompany(params.remove('supplier'))
 
                 bindData(crmProduct, params, [include: CrmProduct.BIND_WHITELIST])
@@ -165,6 +179,10 @@ class CrmProductController {
                 redirect(action: "show", id: crmProduct.id)
                 break
         }
+    }
+
+    private savePresentation(CrmProduct crmProduct, String template) {
+        crmContentService.createResource(new ByteArrayInputStream(template.bytes), "presentation.html", template.length(), "text/html", crmProduct, [overwrite:true])
     }
 
     private CrmContact getCompany(String name) {
@@ -210,5 +228,21 @@ class CrmProductController {
         def result = crmContactService.list([name: params.q], [max: 100]).collect { [it.name, it.id] }
         WebUtils.noCache(response)
         render result as JSON
+    }
+
+    def presentation(Long id) {
+        def crmProduct = CrmProduct.get(id)
+        if(! crmProduct) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND)
+            return
+        }
+        def bytes = crmContentService.getBytes(crmProduct, 'presentation.html')
+        //def res = crmContentService.findResourcesByReference(crmProduct,[name:"presentation.html"])?.find{it}
+        if(bytes) {
+            render contentType: "text/html", text: new String(bytes)
+            //crmContentService.writeTo(res.resource, response.outputStream)
+        } else {
+            render ''
+        }
     }
 }

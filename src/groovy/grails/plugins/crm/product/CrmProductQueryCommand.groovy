@@ -23,5 +23,15 @@ class CrmProductQueryCommand implements Serializable {
     String number
     String name
     String supplier
+    String suppliersNumber
     String productGroup
+    String barcode
+    String customsCode
+    boolean enabled
+    Float weight
+    Float price
+
+    String toString() {
+        name.toString()
+    }
 }

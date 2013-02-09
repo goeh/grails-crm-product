@@ -18,6 +18,7 @@ package grails.plugins.crm.product
 
 import grails.plugins.crm.contact.CrmContact
 import grails.plugins.crm.core.TenantEntity
+import grails.plugins.crm.core.TenantUtils
 
 @TenantEntity
 class CrmProduct {
@@ -58,7 +59,7 @@ class CrmProduct {
         prices sort: 'fromAmount', 'asc'
     }
 
-    static transients = ['price', 'vat', 'includes', 'excludes', 'depends']
+    static transients = ['productPrice', 'price', 'vat', 'includes', 'excludes', 'depends']
 
     static taggable = true
     static attachmentable = true
@@ -66,12 +67,41 @@ class CrmProduct {
     static relatable = true
     static auditable = true
 
-    transient Float getPrice(CrmPriceList priceList = null) {
-        prices?.find { priceList ? it.priceList == priceList : true }?.outPrice
+    transient CrmProductPrice getProductPrice(Float amount = 0f, Object priceList = null, String unit = null) {
+        if (!prices) {
+            return null
+        }
+        if (priceList) {
+            if(!(priceList instanceof CrmPriceList)) {
+                priceList = CrmPriceList.findByParamAndTenantId(priceList.toString(), TenantUtils.tenant)
+                if(! priceList) {
+                    return null
+                }
+            }
+        } else {
+            // Grab the first price list ordered by it's orderIndex
+            priceList = prices.sort{it.priceList.orderIndex}.head().priceList
+        }
+        if (!amount) {
+            amount = 1
+        }
+        // Filter by price list
+        def tmp = prices.findAll { it.priceList == priceList }
+        if (!unit) {
+            // Grab first unit we find in the list
+            unit = tmp.collect{it.unit}.sort().head()
+        }
+        tmp = tmp.findAll{it.unit == unit}
+        // Sort by descending fromAmount to find the best matching price
+        tmp.sort { it.fromAmount }.reverse().find{it.fromAmount == null || it.fromAmount <= amount}
     }
 
-    transient Float getVat(CrmPriceList priceList = null) {
-        prices?.find { priceList ? it.priceList == priceList : true }?.vat
+    transient Float getPrice(Float amount = 0f, Object priceList = null, String unit = null) {
+        getProductPrice(amount, priceList, unit)?.outPrice
+    }
+
+    transient Float getVat(Float amount = 0f, Object priceList = null, String unit = null) {
+        getProductPrice(amount, priceList, unit)?.vat
     }
 
     transient List<CrmProduct> getIncludes() {

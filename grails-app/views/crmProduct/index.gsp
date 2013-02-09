@@ -24,28 +24,39 @@
 
                 <f:with bean="cmd">
                     <div class="span4">
-                        <div class="row-fluid">
-                            <f:field property="number" label="crmProduct.number.label" input-class="span12"
-                                     input-autofocus=""
+                            <f:field property="number" label="crmProduct.number.label"
+                                     input-class="input-large" input-autofocus=""
                                      input-placeholder="${message(code: 'crmProductQueryCommand.number.placeholder', default: '')}"/>
                             <f:field property="name" label="crmProduct.name.label"
-                                     input-class="span12"
+                                     input-class="input-large"
                                      input-placeholder="${message(code: 'crmProductQueryCommand.name.placeholder', default: '')}"/>
                             <f:field property="productGroup" label="crmProduct.group.label"
-                                     input-class="span12"
+                                     input-class="input-large"
                                      input-placeholder="${message(code: 'crmProductQueryCommand.productGroup.placeholder', default: '')}"/>
-                        </div>
                     </div>
 
                     <div class="span4">
-                        <div class="row-fluid">
+                            <f:field property="suppliersNumber" label="crmProduct.suppliersNumber.label"
+                                     input-class="input-large"
+                                     input-placeholder="${message(code: 'crmProductQueryCommand.suppliersNumber.placeholder', default: '')}"/>
                             <f:field property="supplier" label="crmProduct.supplier.label"
-                                     input-class="span12"
+                                     input-class="input-large"
                                      input-placeholder="${message(code: 'crmProductQueryCommand.supplier.placeholder', default: '')}"/>
-                        </div>
+                            <f:field property="barcode" label="crmProduct.barcode.label"
+                                     input-class="input-large"
+                                     input-placeholder="${message(code: 'crmProductQueryCommand.barcode.placeholder', default: '')}"/>
+                            <f:field property="customsCode" label="crmProduct.customsCode.label"
+                                     input-class="input-large"
+                                     input-placeholder="${message(code: 'crmProductQueryCommand.customsCode.placeholder', default: '')}"/>
                     </div>
 
                     <div class="span4">
+                            <f:field property="price" label="crmProduct.price.label"
+                                     input-class="input-small"
+                                     input-placeholder="${message(code: 'crmProductQueryCommand.price.placeholder', default: '')}"/>
+                            <f:field property="weight" label="crmProduct.weight.label"
+                                     input-class="input-small"
+                                     input-placeholder="${message(code: 'crmProductQueryCommand.weight.placeholder', default: '')}"/>
                     </div>
 
                 </f:with>

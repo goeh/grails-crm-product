@@ -26,8 +26,8 @@
 
             <td>${fieldValue(bean: price, field: "fromAmount")}</td>
             <td>${fieldValue(bean: price, field: "unit")}</td>
-            <td><g:formatNumber number="${price.inPrice}" minFractionDigits="2" maxFractionDigits="2"/></td>
-            <td><g:formatNumber number="${price.outPrice}" minFractionDigits="2" maxFractionDigits="2"/></td>
+            <td><g:formatNumber number="${price.inPrice}" type="currency" currencyCode="${currency}" minFractionDigits="2" maxFractionDigits="2"/></td>
+            <td><g:formatNumber number="${price.outPrice}" type="currency" currencyCode="${currency}" minFractionDigits="2" maxFractionDigits="2"/></td>
             <td><g:formatNumber number="${price.vat ?: 0}" type="percent"/></td>
 
         </tr>
