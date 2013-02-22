@@ -24,8 +24,8 @@ class CrmProductPrice {
     CrmPriceList priceList
 
     String unit
-    Float fromAmount
-    Float inPrice
+    Float fromAmount = 1
+    Float inPrice = 0f
     Float outPrice
     Float vat
 

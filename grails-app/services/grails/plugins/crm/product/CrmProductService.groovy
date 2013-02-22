@@ -31,8 +31,8 @@ class CrmProductService {
     @Listener(namespace = "crmProduct", topic = "enableFeature")
     def enableFeature(event) {
         // event = [feature: feature, tenant: tenant, role:role, expires:expires]
-        def tenant = crmSecurityService.getTenantInfo(event.tenant)
-        TenantUtils.withTenant(tenant.id) {
+        def tenant = event.tenant
+        TenantUtils.withTenant(tenant) {
             crmTagService.createTag(name: CrmProduct.name, multiple: true)
         }
     }
@@ -175,6 +175,10 @@ class CrmProductService {
 
     def listProductGroups(Map params) {
         CrmProductGroup.findAllByTenantId(TenantUtils.tenant, params)
+    }
+
+    CrmProductGroup getProductGroup(String param) {
+        CrmProductGroup.findByParamAndTenantId(param, TenantUtils.tenant)
     }
 
     CrmProductGroup createProductGroup(Map params, boolean save = false) {

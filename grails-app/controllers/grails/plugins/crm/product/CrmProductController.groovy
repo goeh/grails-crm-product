@@ -181,10 +181,6 @@ class CrmProductController {
         }
     }
 
-    private savePresentation(CrmProduct crmProduct, String template) {
-        crmContentService.createResource(new ByteArrayInputStream(template.bytes), "presentation.html", template.length(), "text/html", crmProduct, [overwrite:true])
-    }
-
     private CrmContact getCompany(String name) {
         if (!name) {
             return null
@@ -244,5 +240,9 @@ class CrmProductController {
         } else {
             render ''
         }
+    }
+
+    private savePresentation(CrmProduct crmProduct, String template) {
+        crmContentService.createResource(new ByteArrayInputStream(template.bytes), "presentation.html", template.length(), "text/html", crmProduct, [overwrite:true])
     }
 }
