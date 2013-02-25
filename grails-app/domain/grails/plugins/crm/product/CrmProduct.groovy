@@ -59,7 +59,7 @@ class CrmProduct {
         prices sort: 'fromAmount', 'asc'
     }
 
-    static transients = ['productPrice', 'price', 'vat', 'includes', 'excludes', 'depends']
+    static transients = ['productPrice', 'price', 'vat', 'related', 'includes', 'excludes', 'depends']
 
     static taggable = true
     static attachmentable = true
@@ -72,15 +72,15 @@ class CrmProduct {
             return null
         }
         if (priceList) {
-            if(!(priceList instanceof CrmPriceList)) {
+            if (!(priceList instanceof CrmPriceList)) {
                 priceList = CrmPriceList.findByParamAndTenantId(priceList.toString(), TenantUtils.tenant)
-                if(! priceList) {
+                if (!priceList) {
                     return null
                 }
             }
         } else {
             // Grab the first price list ordered by it's orderIndex
-            priceList = prices.sort{it.priceList.orderIndex}.head().priceList
+            priceList = prices.sort { it.priceList.orderIndex }.head().priceList
         }
         if (!amount) {
             amount = 1
@@ -89,11 +89,11 @@ class CrmProduct {
         def tmp = prices.findAll { it.priceList == priceList }
         if (!unit) {
             // Grab first unit we find in the list
-            unit = tmp.collect{it.unit}.sort().head()
+            unit = tmp.collect { it.unit }.sort().head()
         }
-        tmp = tmp.findAll{it.unit == unit}
+        tmp = tmp.findAll { it.unit == unit }
         // Sort by descending fromAmount to find the best matching price
-        tmp.sort { it.fromAmount }.reverse().find{it.fromAmount == null || it.fromAmount <= amount}
+        tmp.sort { it.fromAmount }.reverse().find { it.fromAmount == null || it.fromAmount <= amount }
     }
 
     transient Float getPrice(Float amount = 0f, Object priceList = null, String unit = null) {
@@ -102,6 +102,26 @@ class CrmProduct {
 
     transient Float getVat(Float amount = 0f, Object priceList = null, String unit = null) {
         getProductPrice(amount, priceList, unit)?.vat
+    }
+
+    transient List<CrmProduct> getRelated() {
+        def result = []
+        for (c in compositions) {
+            if (c.type == CrmProductComposition.RELATED) {
+                result << c.product
+            }
+        }
+        return result
+    }
+
+    def addRelated(CrmProduct related, Float quantity = null) {
+        if (related == this) {
+            throw new IllegalArgumentException("self reference")
+        }
+        if (!compositions?.find { it.product == related }) {
+            addToCompositions(product: related, quantity: quantity, type: CrmProductComposition.RELATED)
+        }
+        return this
     }
 
     transient List<CrmProduct> getIncludes() {

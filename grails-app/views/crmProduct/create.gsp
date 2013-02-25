@@ -65,7 +65,9 @@
                                      autocomplete="off"/>
                     </f:field>
                     <f:field property="suppliersNumber" input-class="span6"/>
-                    <f:field property="group" input-class="span12"/>
+                    <f:field property="group">
+                        <g:select name="group.id" from="${productGroups}" optionKey="id" value="${crmProduct.group?.id}"/>
+                    </f:field>
                 </div>
             </div>
 

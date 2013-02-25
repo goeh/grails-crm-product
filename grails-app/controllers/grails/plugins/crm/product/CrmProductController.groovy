@@ -97,17 +97,17 @@ class CrmProductController {
 
     def create() {
         def crmProduct = crmProductService.createProduct(params)
-
+        def groups = crmProductService.listProductGroups()
         switch (request.method) {
             case "GET":
-                return [crmProduct: crmProduct]
+                return [crmProduct: crmProduct, productGroups: groups]
             case "POST":
                 crmProduct.supplier = getCompany(params.remove('supplier'))
 
                 bindData(crmProduct, params, [include: CrmProduct.BIND_WHITELIST])
 
                 if (crmProduct.hasErrors() || !crmProduct.save()) {
-                    render(view: "create", model: [crmProduct: crmProduct])
+                    render(view: "create", model: [crmProduct: crmProduct, productGroups: groups])
                     return
                 }
 
@@ -150,16 +150,17 @@ class CrmProductController {
             redirect(action: "index")
             return
         }
+        def groups = crmProductService.listProductGroups()
         switch (request.method) {
             case "GET":
-                return [crmProduct: crmProduct, vatList: getVatList()]
+                return [crmProduct: crmProduct, productGroups: groups, vatList: getVatList()]
             case "POST":
                 if (params.int('version') != null) {
                     if (crmProduct.version > params.int('version')) {
                         crmProduct.errors.rejectValue("version", "crmProduct.optimistic.locking.failure",
                                 [message(code: 'crmProduct.label', default: 'Product')] as Object[],
                                 "Another user has updated this Product while you were editing")
-                        render(view: "edit", model: [crmProduct: crmProduct, vatList: getVatList()])
+                        render(view: "edit", model: [crmProduct: crmProduct, productGroups: groups, vatList: getVatList()])
                         return
                     }
                 }
@@ -171,7 +172,7 @@ class CrmProductController {
                 bindData(crmProduct, params, [include: CrmProduct.BIND_WHITELIST])
 
                 if (!crmProduct.save(flush: true)) {
-                    render(view: "edit", model: [crmProduct: crmProduct, vatList: getVatList()])
+                    render(view: "edit", model: [crmProduct: crmProduct, productGroups: groups, vatList: getVatList()])
                     return
                 }
 

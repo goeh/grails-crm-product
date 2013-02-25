@@ -11,6 +11,7 @@ class CrmProductComposition {
     public static final int EQUIVALENT = 2
     public static final int REPLACES = 3
     public static final int OPTION = 4
+    public static final int RELATED = 5
 
     CrmProduct product
     Float quantity
@@ -20,7 +21,7 @@ class CrmProductComposition {
 
     static constraints = {
         quantity(nullable: true)
-        type(inList: [EXCLUDES, INCLUDES, DEPENDS, EQUIVALENT, REPLACES, OPTION])
+        type(inList: [EXCLUDES, INCLUDES, DEPENDS, EQUIVALENT, REPLACES, OPTION, RELATED])
     }
 
     String toString() {
