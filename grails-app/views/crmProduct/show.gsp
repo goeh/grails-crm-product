@@ -43,6 +43,12 @@
                                     <dd><g:fieldValue bean="${crmProduct}" field="name"/></dd>
                                 </g:if>
 
+                                <g:if test="${crmProduct?.displayNumber}">
+                                    <dt><g:message code="crmProduct.displayNumber.label" default="Display Number"/></dt>
+
+                                    <dd><g:fieldValue bean="${crmProduct}" field="displayNumber"/></dd>
+                                </g:if>
+
                                 <g:if test="${crmProduct?.displayName}">
                                     <dt><g:message code="crmProduct.displayName.label" default="Display Name"/></dt>
 

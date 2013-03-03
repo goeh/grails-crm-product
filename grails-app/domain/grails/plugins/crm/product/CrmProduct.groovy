@@ -23,11 +23,12 @@ import grails.plugins.crm.core.TenantUtils
 @TenantEntity
 class CrmProduct {
 
-    public static final List BIND_WHITELIST = ['number', 'name', 'displayName', 'description',
+    public static final List BIND_WHITELIST = ['number', 'name', 'displayNumber', 'displayName', 'description',
             'supplier', 'suppliersNumber', 'group', 'barcode', 'customsCode', 'weight', 'enabled', 'prices']
 
     String number
     String name
+    String displayNumber
     String displayName
     String description
     String suppliersNumber
@@ -44,6 +45,7 @@ class CrmProduct {
     static constraints = {
         number(maxSize: 40, blank: false, unique: 'tenantId')
         name(maxSize: 255, blank: false)
+        displayNumber(maxSize: 80, nullable: true)
         displayName(maxSize: 255, nullable: true)
         description(maxSize: 2000, nullable: true, widget: 'textarea')
         supplier(nullable: true)

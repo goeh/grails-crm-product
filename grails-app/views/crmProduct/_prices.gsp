@@ -12,6 +12,7 @@
         <crm:sortableColumn property="outPrice"
                                     title="${message(code: 'crmProductPrice.outPrice.label', default: 'Price')}"/>
         <th><g:message code="crmProductPrice.vat.label" default="VAT"/></th>
+        <th><g:message code="crmProductPrice.priceVAT.label" default="Price inc. VAT"/></th>
     </tr>
     </thead>
     <tbody>
@@ -29,7 +30,7 @@
             <td><g:formatNumber number="${price.inPrice}" type="currency" currencyCode="${currency}" minFractionDigits="2" maxFractionDigits="2"/></td>
             <td><g:formatNumber number="${price.outPrice}" type="currency" currencyCode="${currency}" minFractionDigits="2" maxFractionDigits="2"/></td>
             <td><g:formatNumber number="${price.vat ?: 0}" type="percent"/></td>
-
+            <td><g:formatNumber number="${price.priceVAT}" type="currency" currencyCode="${currency}" minFractionDigits="2" maxFractionDigits="2"/></td>
         </tr>
     </g:each>
     </tbody>

@@ -94,7 +94,10 @@ class CrmProductService {
         CrmProduct.createCriteria().list(params) {
             eq('tenantId', TenantUtils.tenant)
             if (query.number) {
-                ilike('number', SearchUtils.wildcard(query.number))
+                or {
+                    ilike('number', SearchUtils.wildcard(query.number))
+                    ilike('displayNumber', SearchUtils.wildcard(query.number))
+                }
             }
             if (query.name) {
                 or {

@@ -22,8 +22,6 @@ import grails.plugins.crm.core.WebUtils
 import grails.plugins.crm.core.TenantUtils
 import grails.plugins.crm.contact.CrmContact
 
-import javax.servlet.http.HttpServletResponse
-
 class CrmProductController {
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
@@ -32,7 +30,6 @@ class CrmProductController {
     def selectionService
     def crmProductService
     def crmContactService
-    def crmContentService
 
     def index() {
         // If any query parameters are specified in the URL, let them override the last query stored in session.
@@ -165,8 +162,6 @@ class CrmProductController {
                     }
                 }
 
-                savePresentation(crmProduct, params.template)
-
                 crmProduct.supplier = getCompany(params.remove('supplier'))
 
                 bindData(crmProduct, params, [include: CrmProduct.BIND_WHITELIST])
@@ -227,23 +222,4 @@ class CrmProductController {
         render result as JSON
     }
 
-    def presentation(Long id) {
-        def crmProduct = CrmProduct.get(id)
-        if(! crmProduct) {
-            response.sendError(HttpServletResponse.SC_NOT_FOUND)
-            return
-        }
-        def bytes = crmContentService.getBytes(crmProduct, 'presentation.html')
-        //def res = crmContentService.findResourcesByReference(crmProduct,[name:"presentation.html"])?.find{it}
-        if(bytes) {
-            render contentType: "text/html", text: new String(bytes)
-            //crmContentService.writeTo(res.resource, response.outputStream)
-        } else {
-            render ''
-        }
-    }
-
-    private savePresentation(CrmProduct crmProduct, String template) {
-        crmContentService.createResource(new ByteArrayInputStream(template.bytes), "presentation.html", template.length(), "text/html", crmProduct, [overwrite:true])
-    }
 }

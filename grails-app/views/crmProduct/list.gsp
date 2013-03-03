@@ -34,7 +34,7 @@
 
         <crm:sortableColumn property="supplier.name"
                             title="${message(code: 'crmProduct.supplier.label', default: 'Supplier')}"/>
-        <th class="money"><g:message code="crmProduct.price.label" default="Price"/></th>
+        <th class="money"><g:message code="crmProductPrice.priceVAT.label" default="Price inc. VAT"/></th>
     </tr>
     </thead>
     <tbody>
@@ -42,13 +42,13 @@
         <g:set var="price" value="${crmProduct.getProductPrice()}"/>
         <tr>
 
-            <td>
+            <td title="${crmProduct.displayNumber?.encodeAsHTML()}">
                 <g:link controller="crmProduct" action="show" id="${crmProduct.id}">
                     ${fieldValue(bean: crmProduct, field: "number")}
                 </g:link>
             </td>
 
-            <td>
+            <td title="${crmProduct.displayName?.encodeAsHTML()}">
                 <g:link controller="crmProduct" action="show" id="${crmProduct.id}">
                     ${fieldValue(bean: crmProduct, field: "name")}
                 </g:link>
@@ -63,9 +63,11 @@
                         id="${crmProduct.supplier?.id}">${crmProduct.supplier?.encodeAsHTML()}</g:link>
             </td>
             <td class="money">
-                <g:formatNumber number="${price.outPrice}"
-                                type="currency" currencyCode="${currency}"
-                                maxFractionDigits="2"/> / ${price.unit}
+                <g:if test="${price}">
+                    <g:formatNumber number="${price.priceVAT}"
+                                    type="currency" currencyCode="${currency}"
+                                    maxFractionDigits="2"/> / ${price.unit}
+                </g:if>
             </td>
 
         </tr>

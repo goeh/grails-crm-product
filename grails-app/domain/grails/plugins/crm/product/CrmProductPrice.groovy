@@ -42,6 +42,14 @@ class CrmProductPrice {
         sort 'fromAmount'
     }
 
+    static transients = ['priceVAT']
+
+    Float getPriceVAT() {
+        def p = outPrice ?: 0
+        def v = vat ?: 0
+        return p + (p * v)
+    }
+
     String toString() {
         "$outPrice / $unit".toString()
     }

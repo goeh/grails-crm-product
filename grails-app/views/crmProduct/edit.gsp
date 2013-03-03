@@ -76,6 +76,7 @@
                             <div class="row-fluid">
                                 <f:field property="number" input-autofocus="" input-class="span12"/>
                                 <f:field property="name" input-class="span12"/>
+                                <f:field property="displayNumber" input-class="span12"/>
                                 <f:field property="displayName" input-class="span12"/>
                             </div>
                         </div>
