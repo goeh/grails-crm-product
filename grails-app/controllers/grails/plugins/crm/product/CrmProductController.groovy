@@ -59,7 +59,11 @@ class CrmProductController {
         def result
         try {
             result = selectionService.select(uri, params)
-            [crmProductList: result, crmProductTotal: result.totalCount, selection: uri, currency: "SEK"]
+            if (result.size() == 1) {
+                redirect action: "show", id: result.head().ident()
+            } else {
+                [crmProductList: result, crmProductTotal: result.totalCount, selection: uri, currency: "SEK"]
+            }
         } catch (Exception e) {
             flash.error = e.message
             [crmProductList: [], crmProductTotal: 0, selection: uri, currency: "SEK"] // TODO SEK!!!

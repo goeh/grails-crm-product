@@ -2,7 +2,7 @@ import grails.plugins.crm.product.CrmPriceList
 import grails.plugins.crm.product.CrmProduct
 import grails.plugins.crm.product.CrmProductGroup
 
-grails.cache.config = {
+config = {
 // Hibernate domain class second-level caches.
     domain {
         name CrmProduct
