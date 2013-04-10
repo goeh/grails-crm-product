@@ -33,7 +33,7 @@ grails.project.dependency.resolution = {
         test(":spock:0.7") { export = false }
 
         compile "grails.crm:crm-core:latest.integration"
-        compile "grails.crm:crm-contact-lite:latest.integration"
+        compile "grails.crm:crm-contact:latest.integration"
         runtime "grails.crm:crm-tags:latest.integration"
 
         compile ":selection:latest.integration"
