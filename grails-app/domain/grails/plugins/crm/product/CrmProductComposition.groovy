@@ -14,7 +14,7 @@ class CrmProductComposition {
     public static final int RELATED = 5
 
     CrmProduct product
-    Float quantity
+    Double quantity
     int type
 
     static belongsTo = [mainProduct: CrmProduct]

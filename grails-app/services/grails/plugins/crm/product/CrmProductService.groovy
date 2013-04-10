@@ -25,7 +25,6 @@ class CrmProductService {
 
     static transactional = true
 
-    def crmSecurityService
     def crmTagService
 
     @Listener(namespace = "crmProduct", topic = "enableFeature")
@@ -256,7 +255,7 @@ class CrmProductService {
      * @param unit unit to get price for
      * @return outPrice for the product, or null if no price are found
      */
-    Float getPrice(String productNumber, Integer amount = null, Object priceList = null, String unit = null) {
+    Double getPrice(String productNumber, Integer amount = null, Object priceList = null, String unit = null) {
         CrmProduct.findByNumberAndTenantId(productNumber, TenantUtils.tenant, [cache: true])?.getPrice(amount, priceList, unit)
     }
 }

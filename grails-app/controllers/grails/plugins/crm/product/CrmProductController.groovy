@@ -140,7 +140,7 @@ class CrmProductController {
     // TODO !!!!!!
     private List getVatList() {
         [0, 6, 12, 25].collect {
-            [label: "${it}%", value: (it / 100).floatValue()]
+            [label: "${it}%", value: (it / 100).doubleValue()]
         }
     }
 

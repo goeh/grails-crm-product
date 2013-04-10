@@ -28,8 +28,8 @@ class CrmProductQueryCommand implements Serializable {
     String barcode
     String customsCode
     boolean enabled
-    Float weight
-    Float price
+    Double weight
+    Double price
 
     String toString() {
         name.toString()

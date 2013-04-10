@@ -36,7 +36,7 @@ class CrmProduct {
     CrmProductGroup group
     String barcode
     String customsCode
-    Float weight // TODO should weight be in CrmProductPrice instead?
+    Double weight // TODO should weight be in CrmProductPrice instead?
     boolean enabled
 
     static hasMany = [prices: CrmProductPrice, compositions: CrmProductComposition]
@@ -61,7 +61,7 @@ class CrmProduct {
         prices sort: 'fromAmount', 'asc'
     }
 
-    static transients = ['productPrice', 'price', 'vat', 'related', 'includes', 'excludes', 'depends']
+    static transients = ['productPrice', 'price', 'vat', 'unit', 'related', 'includes', 'excludes', 'depends']
 
     static taggable = true
     static attachmentable = true
@@ -69,7 +69,7 @@ class CrmProduct {
     static relatable = true
     static auditable = true
 
-    transient CrmProductPrice getProductPrice(Float amount = 0f, Object priceList = null, String unit = null) {
+    transient CrmProductPrice getProductPrice(Number amount = 0.0, Object priceList = null, String unit = null) {
         if (!prices) {
             return null
         }
@@ -98,12 +98,16 @@ class CrmProduct {
         tmp.sort { it.fromAmount }.reverse().find { it.fromAmount == null || it.fromAmount <= amount }
     }
 
-    transient Float getPrice(Float amount = 0f, Object priceList = null, String unit = null) {
+    transient Double getPrice(Number amount = 0.0, Object priceList = null, String unit = null) {
         getProductPrice(amount, priceList, unit)?.outPrice
     }
 
-    transient Float getVat(Float amount = 0f, Object priceList = null, String unit = null) {
+    transient Double getVat(Number amount = 0.0, Object priceList = null, String unit = null) {
         getProductPrice(amount, priceList, unit)?.vat
+    }
+
+    transient String getUnit(Number amount = 0.0, Object priceList = null, String unit = null) {
+        getProductPrice(amount, priceList, unit)?.unit
     }
 
     transient List<CrmProduct> getRelated() {
@@ -116,7 +120,7 @@ class CrmProduct {
         return result
     }
 
-    def addRelated(CrmProduct related, Float quantity = null) {
+    def addRelated(CrmProduct related, Number quantity = null) {
         if (related == this) {
             throw new IllegalArgumentException("self reference")
         }
@@ -136,7 +140,7 @@ class CrmProduct {
         return result
     }
 
-    def addIncludes(CrmProduct included, Float quantity = null) {
+    def addIncludes(CrmProduct included, Number quantity = null) {
         if (included == this) {
             throw new IllegalArgumentException("self reference")
         }
@@ -156,7 +160,7 @@ class CrmProduct {
         return result
     }
 
-    def addExcludes(CrmProduct excluded, Float quantity = null) {
+    def addExcludes(CrmProduct excluded, Number quantity = null) {
         if (excluded == this) {
             throw new IllegalArgumentException("self reference")
         }
@@ -176,7 +180,7 @@ class CrmProduct {
         return result
     }
 
-    def addDepends(CrmProduct dependedOn, Float quantity = null) {
+    def addDepends(CrmProduct dependedOn, Number quantity = null) {
         if (dependedOn == this) {
             throw new IllegalArgumentException("self reference")
         }

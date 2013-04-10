@@ -91,12 +91,12 @@ class ProductServiceSpec extends grails.plugin.spock.IntegrationSpec {
 
         then: "check that we get correct prices"
         p.save(failOnError: true, flush: true)
-        crmProductService.getPrice("dellxps15") == 1299.99f
-        crmProductService.getPrice("dellxps15", 1) == 1299.99f
-        crmProductService.getPrice("dellxps15", 5) == 1299.99f
-        crmProductService.getPrice("dellxps15", 15) == 1199.99f
-        crmProductService.getPrice("dellxps15", 50) == 1199.99f
-        crmProductService.getPrice("dellxps15", 150) == 999.99f
+        crmProductService.getPrice("dellxps15") == 1299.99
+        crmProductService.getPrice("dellxps15", 1) == 1299.99
+        crmProductService.getPrice("dellxps15", 5) == 1299.99
+        crmProductService.getPrice("dellxps15", 15) == 1199.99
+        crmProductService.getPrice("dellxps15", 50) == 1199.99
+        crmProductService.getPrice("dellxps15", 150) == 999.99
     }
 
     def "test multiple price lists"() {
@@ -114,13 +114,13 @@ class ProductServiceSpec extends grails.plugin.spock.IntegrationSpec {
 
         then: "check that we get correct prices"
         p.save(failOnError: true, flush: true)
-        crmProductService.getPrice("v240") == 9000f
-        crmProductService.getPrice("v240", 1, priceList1) == 9000f
-        crmProductService.getPrice("v240", 1, priceList2) == 5000f
-        crmProductService.getPrice("v240", 1, priceList3) == 2000f
-        p.getPrice(1, priceList1) == 9000f
-        p.getPrice(2, priceList2) == 5000f
-        p.getPrice(3, priceList3) == 2000f
+        crmProductService.getPrice("v240") == 9000
+        crmProductService.getPrice("v240", 1, priceList1) == 9000
+        crmProductService.getPrice("v240", 1, priceList2) == 5000
+        crmProductService.getPrice("v240", 1, priceList3) == 2000
+        p.getPrice(1, priceList1) == 9000
+        p.getPrice(2, priceList2) == 5000
+        p.getPrice(3, priceList3) == 2000
     }
 
     def "test different prices by quantity and unit"() {

@@ -24,27 +24,31 @@ class CrmProductPrice {
     CrmPriceList priceList
 
     String unit
-    Float fromAmount = 1
-    Float inPrice = 0f
-    Float outPrice
-    Float vat
+    Double fromAmount = 1
+    Double inPrice = 0
+    Double outPrice
+    Double vat
 
     static belongsTo = [product:CrmProduct]
 
     static constraints = {
         unit(maxSize: 40, blank: false)
-        inPrice(min:-999999f, max:999999f, scale:2, nullable: false)
-        outPrice(min:-999999f, max:999999f, scale:2, nullable: false)
-        vat(min: 0f, max: 1f, scale: 2)
+        inPrice(min:-999999d, max:999999d, scale:2, nullable: false)
+        outPrice(min:-999999d, max:999999d, scale:2, nullable: false)
+        vat(min: 0d, max: 1d, scale: 2)
     }
 
     static mapping = {
         sort 'fromAmount'
     }
 
-    static transients = ['priceVAT']
+    static transients = ['price', 'priceVAT']
 
-    Float getPriceVAT() {
+    Double getPrice() {
+        outPrice
+    }
+
+    Double getPriceVAT() {
         def p = outPrice ?: 0
         def v = vat ?: 0
         return p + (p * v)
