@@ -28,31 +28,4 @@ Provides product/item management for orders and sales projects, etc.
     def issueManagement = [system: "github", url: "https://github.com/goeh/grails-crm-product/issues"]
     def scm = [url: "https://github.com/goeh/grails-crm-product"]
 
-    def features = {
-        crmProduct {
-            description "Product Catalogue"
-            link controller: "crmProduct", action: "index"
-            permissions {
-                guest "crmProduct:index,list,show"
-                user "crmProduct:*"
-                admin "crmProduct,crmProductGroup,crmPriceList:*"
-            }
-            hidden true
-        }
-    }
-/*
-    def doWithApplicationContext = { applicationContext ->
-        def crmCoreService = applicationContext.crmCoreService
-        def crmPluginService = applicationContext.crmPluginService
-        def crmContentService = applicationContext.containsBean('crmContentService') ? applicationContext.crmContentService : null
-        if (crmContentService) {
-            crmPluginService.registerView('crmProduct', 'show', 'tabs',
-                    [id: "resources", index: 250, permission: "crmProduct:show", label: "Media", template: '/crmProduct/resources', plugin: "crm-product", model: {
-                        def result = crmContentService.findResourcesByReference(crmProduct, [sort: 'title', order: 'asc'])
-                        return [list: result, totalCount: result.totalCount, reference: crmCoreService.getReferenceIdentifier(crmProduct)]
-                    }]
-            )
-        }
-    }
-*/
 }

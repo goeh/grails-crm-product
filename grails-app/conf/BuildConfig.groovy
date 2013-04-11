@@ -37,7 +37,7 @@ grails.project.dependency.resolution = {
         runtime "grails.crm:crm-tags:latest.integration"
 
         compile ":selection:latest.integration"
-        runtime ":selection-repository:latest.integration"
+        //runtime ":selection-repository:latest.integration"
     }
 }
 
