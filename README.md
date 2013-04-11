@@ -12,4 +12,7 @@ With CRM we mean features like:
 
 
 ## Product Plugin
-This plugin provides product administration features.
+This plugin provides product domain classes and services.
+
+### Related Plugins
+This *crm-product-ui* plugin provides user interface for managing products.
