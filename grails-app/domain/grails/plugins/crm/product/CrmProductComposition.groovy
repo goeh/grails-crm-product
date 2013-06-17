@@ -13,6 +13,9 @@ class CrmProductComposition {
     public static final int OPTION = 4
     public static final int RELATED = 5
 
+    public static final Map<String, Integer> TYPE_SYMBOLS = [excludes: EXCLUDES, includes: INCLUDES, depends: DEPENDS,
+            equivalent: EQUIVALENT, replaces: REPLACES, option: OPTION, related: RELATED].asImmutable()
+
     CrmProduct product
     Double quantity
     int type
@@ -21,7 +24,17 @@ class CrmProductComposition {
 
     static constraints = {
         quantity(nullable: true)
-        type(inList: [EXCLUDES, INCLUDES, DEPENDS, EQUIVALENT, REPLACES, OPTION, RELATED])
+        type(inList: TYPE_SYMBOLS.values().toList())
+    }
+
+    static transients = ['typeSymbol']
+
+    String getTypeSymbol() {
+        TYPE_SYMBOLS.find{it.value == type}?.key
+    }
+
+    void setTypeSymbol(String arg) {
+        type = (TYPE_SYMBOLS[arg] ?: 0)
     }
 
     String toString() {

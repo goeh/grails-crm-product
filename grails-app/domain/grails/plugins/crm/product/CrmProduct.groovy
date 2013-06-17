@@ -59,6 +59,7 @@ class CrmProduct {
     static mapping = {
         sort "number"
         prices sort: 'fromAmount', 'asc'
+        compositions sort: 'product', 'asc'
     }
 
     static transients = ['productPrice', 'price', 'vat', 'unit', 'related', 'includes', 'excludes', 'depends']

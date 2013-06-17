@@ -125,25 +125,25 @@ class ProductServiceSpec extends grails.plugin.spock.IntegrationSpec {
 
     def "test different prices by quantity and unit"() {
 
-            given: "create one product and multiple price lists"
-            def priceList1 = crmProductService.createPriceList(param: 'p', name: 'Private', true)
-            def priceList2 = crmProductService.createPriceList(param: 'biz', name: 'Business', true)
-            def p = crmProductService.createProduct(number: "meat", name: "Meat", group: foo)
+        given: "create one product and multiple price lists"
+        def priceList1 = crmProductService.createPriceList(param: 'p', name: 'Private', true)
+        def priceList2 = crmProductService.createPriceList(param: 'biz', name: 'Business', true)
+        def p = crmProductService.createProduct(number: "meat", name: "Meat", group: foo)
 
-            when: "create a product with different price lists"
-            p.addToPrices(priceList: priceList1, unit: 'box', fromAmount: 1, inPrice: 0, outPrice: 499, vat: 0.25)
-            p.addToPrices(priceList: priceList1, unit: 'kg', fromAmount: 1, inPrice: 0, outPrice: 99, vat: 0.25)
-            p.addToPrices(priceList: priceList2, unit: 'box', fromAmount: 1, inPrice: 0, outPrice: 399, vat: 0.25)
-            p.addToPrices(priceList: priceList2, unit: 'kg', fromAmount: 1, inPrice: 0, outPrice: 79, vat: 0.25)
+        when: "create a product with different price lists"
+        p.addToPrices(priceList: priceList1, unit: 'box', fromAmount: 1, inPrice: 0, outPrice: 499, vat: 0.25)
+        p.addToPrices(priceList: priceList1, unit: 'kg', fromAmount: 1, inPrice: 0, outPrice: 99, vat: 0.25)
+        p.addToPrices(priceList: priceList2, unit: 'box', fromAmount: 1, inPrice: 0, outPrice: 399, vat: 0.25)
+        p.addToPrices(priceList: priceList2, unit: 'kg', fromAmount: 1, inPrice: 0, outPrice: 79, vat: 0.25)
 
-            then: "check that we get correct prices"
-            p.save(failOnError: true, flush: true)
-            crmProductService.getPrice("meat") == 499
-            crmProductService.getPrice("meat", 1, priceList1) == 499
-            crmProductService.getPrice("meat", 1, priceList2) == 399
-            crmProductService.getPrice("meat", 1, priceList1, "kg") == 99
-            crmProductService.getPrice("meat", 1, priceList2, "kg") == 79
-        }
+        then: "check that we get correct prices"
+        p.save(failOnError: true, flush: true)
+        crmProductService.getPrice("meat") == 499
+        crmProductService.getPrice("meat", 1, priceList1) == 499
+        crmProductService.getPrice("meat", 1, priceList2) == 399
+        crmProductService.getPrice("meat", 1, priceList1, "kg") == 99
+        crmProductService.getPrice("meat", 1, priceList2, "kg") == 79
+    }
 
     def "composition includes"() {
         given:
@@ -173,5 +173,16 @@ class ProductServiceSpec extends grails.plugin.spock.IntegrationSpec {
         silver.getExcludes().contains(bronse)
         bronse.getExcludes().contains(gold)
         bronse.getExcludes().contains(silver)
+    }
+
+    def "type symbols"() {
+        expect:
+        new CrmProductComposition(type:CrmProductComposition.EXCLUDES).typeSymbol == 'excludes'
+        new CrmProductComposition(type:CrmProductComposition.INCLUDES).typeSymbol == 'includes'
+        new CrmProductComposition(type:CrmProductComposition.DEPENDS).typeSymbol == 'depends'
+        new CrmProductComposition(type:CrmProductComposition.EQUIVALENT).typeSymbol == 'equivalent'
+        new CrmProductComposition(type:CrmProductComposition.REPLACES).typeSymbol == 'replaces'
+        new CrmProductComposition(type:CrmProductComposition.OPTION).typeSymbol == 'option'
+        new CrmProductComposition(type:CrmProductComposition.RELATED).typeSymbol == 'related'
     }
 }
