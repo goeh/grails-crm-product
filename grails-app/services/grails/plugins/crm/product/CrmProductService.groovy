@@ -90,8 +90,16 @@ class CrmProductService {
      * @return List of CrmProduct domain instances
      */
     def listProducts(Map query, Map params) {
+        def tagged
+        if (query.tags) {
+            tagged = crmTagService.findAllIdByTag(CrmProduct, query.tags) ?: [0L]
+        }
+
         CrmProduct.createCriteria().list(params) {
             eq('tenantId', TenantUtils.tenant)
+            if (tagged) {
+                inList('id', tagged)
+            }
             if (query.number) {
                 or {
                     ilike('number', SearchUtils.wildcard(query.number))
