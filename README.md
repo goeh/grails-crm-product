@@ -15,4 +15,19 @@ With CRM we mean features like:
 This plugin provides product domain classes and services.
 
 ### Related Plugins
-This *crm-product-ui* plugin provides user interface for managing products.
+The [crm-product-ui](https://github.com/technipelago/grails-crm-product-ui) plugin provides
+a Twitter Bootstrap user interface for managing products.
+
+## Examples
+
+    def pc = crmProductService.createProductGroup(name: 'PC', true)
+    def mac = crmProductService.createProductGroup(name: 'Mac', true)
+
+    def soho = crmProductService.createPriceList(param: 'soho', name: 'SOHO', true)
+
+    def mpb = crmProductService.createProduct(number: 'mbp15', name: 'MacBook Pro 15"', group: mac, true)
+    def dell = crmProductService.createProduct(number: 'dellxps15', name: 'Dell XPS 15"', group: pc, true)
+
+    dell.addToPrices(priceList: soho, unit: 'pcs', fromAmount: 1, inPrice: 649, outPrice: 1299.99, vat: 0.15)
+    dell.addToPrices(priceList: soho, unit: 'pcs', fromAmount: 10, inPrice: 649, outPrice: 1199.99, vat: 0.15)
+    dell.addToPrices(priceList: soho, unit: 'pcs', fromAmount: 100, inPrice: 649, outPrice: 999.99, vat: 0.15)
