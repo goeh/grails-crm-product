@@ -62,13 +62,17 @@ class CrmProduct {
         compositions sort: 'product', 'asc'
     }
 
-    static transients = ['productPrice', 'price', 'vat', 'unit', 'related', 'includes', 'excludes', 'depends']
+    static transients = ['preferredName', 'productPrice', 'price', 'vat', 'unit', 'related', 'includes', 'excludes', 'depends']
 
     static taggable = true
     static attachmentable = true
     static dynamicProperties = true
     static relatable = true
     static auditable = true
+
+    transient String getPreferredName() {
+        displayName ?: name
+    }
 
     transient CrmProductPrice getProductPrice(Number amount = 0.0, Object priceList = null, String unit = null) {
         if (!prices) {
