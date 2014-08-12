@@ -6,7 +6,7 @@ class CrmProductGrailsPlugin {
     def loadAfter = ['crmContact']
     def pluginExcludes = [
             "grails-app/conf/ApplicationResources.groovy",
-            "src/groovy/grails/plugins/crm/product/TestSecurityDelegate.groovy",
+            "src/groovy/grails/plugins/crm/product/ProductTestSecurityDelegate.groovy",
             "grails-app/views/error.gsp"
     ]
     def title = "GR8 CRM Product Services"
