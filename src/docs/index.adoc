@@ -1,0 +1,63 @@
+= GR8 CRM - Product Management Plugin
+Göran Ehrsson <goran@technipelago.se>
+:description: Official documentation for the GR8 CRM Product Management Plugin
+:keywords: groovy, grails, crm, gr8crm, documentation
+:toc:
+:numbered:
+:icons: font
+:imagesdir: ./images
+:source-highlighter: prettify
+:homepage: http://gr8crm.github.io
+:gr8crm: GR8 CRM
+:gr8source: https://github.com/goeh/grails-crm-product
+:license: This plugin is licensed with http://www.apache.org/licenses/LICENSE-2.0.html[Apache License version 2.0]
+
+== Introduction
+
+{gr8crm} is a set of http://www.grails.org/[Grails Web Application Framework]
+plugins that makes it easy to develop web applications with CRM functionality.
+
+You can find more information about {gr8crm} on the main documentation site {homepage}.
+
+=== Customer Relationship Management
+
+Customer relationship management (CRM) is a system for managing a company’s interactions with current and future customers.
+It involves using technology to organize, automate and synchronize sales, marketing, customer service, and technical support.
+http://en.wikipedia.org/wiki/Customer_relationship_management[Wikipedia]
+
+The {gr8crm} "Ecosystem" currently contains over 40 Grails plugins. For a complete list of plugins see {homepage}.
+
+Each {gr8crm} plugin defines a http://martinfowler.com/bliki/BoundedContext.html[Bounded Context]
+that focus on one specific domain, for example *contact*, *project* or *document*.
+
+== Product Management Plugin
+
+This plugin provide storage and services for managing products in {gr8crm} applications. A product is an item that you
+sell or have in your inventory. A product have properties like identification number, name, description and product group.
+The following features are supported by the +crm-product+ plugin.
+
+- Multiple prices, specified by price lists
+- Product compositions (includes, replaces, equivalent, etc.)
+- Attachments (images, brochures) if combined with the +crm-content+ plugin
+- Reference to product suppliers if combined with the +crm-contact+ plugin
+
+Note that this plugin does not contain any user interface components. This plugin contains domain classes and services only.
+The plugin http://gr8crm.github.io/plugins/crm-product-ui/[crm-product-ui] provides a Twitter Bootstrap based user interface
+for managing products and price lists. +crm-product-ui+ depends on +crm-product+ so you only need to include +crm-product-ui+
+in your BuildConfig.groovy if you want end-user product management features.
+
+== Domain Model
+
+image::product-domain.png[Product Management Domain Model]
+
+== Changes
+
+2.0.0:: First public release
+
+== License
+
+{license}
+
+== Source Code
+
+The source code for this plugin is available at {gr8source}
