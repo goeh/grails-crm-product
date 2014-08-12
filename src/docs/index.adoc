@@ -37,6 +37,7 @@ sell or have in your inventory. A product have properties like identification nu
 The following features are supported by the +crm-product+ plugin.
 
 - Multiple prices, specified by price lists
+- Staggered prices
 - Product compositions (includes, replaces, equivalent, etc.)
 - Attachments (images, brochures) if combined with the +crm-content+ plugin
 - Reference to product suppliers if combined with the +crm-contact+ plugin
@@ -49,6 +50,81 @@ in your BuildConfig.groovy if you want end-user product management features.
 == Domain Model
 
 image::product-domain.png[Product Management Domain Model]
+
+=== CrmProduct
+
+[options="header",cols="25,25,50"]
+|===
+| Property          | Type            | Description
+| number            | String          | Product ID / Item Number
+| displayNumber     | String          | Secondary Item Number
+| name              | String          | Product name
+| displayName       | String          | Secondary product name, typically displayed in web shop or catalogues
+| description       | String          | A longer description of the product (max 2000 characters)
+| suppliersNumber   | String          | The supplier's item number
+| supplier          | CrmContact      | Supplier reference
+| group             | CrmProductGroup | Product group
+| barcode           | String          | The product's bar code
+| customsCode       | String          | The product's customs code
+| weight            | Double          | The product's weight
+| enabled           | boolean         | Flag that tells if the product is enabled/active or disabled
+|===
+
+== CrmProductService
+
+Like most other {gr8crm} plugins this plugin have a main service with methods for creating, searching and updating products.
+
+=== Create a new product
+
++CrmProduct createProduct(Map params, boolean save = false)+
+
+To create a product you call the createProduct method with a map of property values.
+
+[source,groovy]
+.CreateUsbCable.groovy
+----
+def hardware = crmProductService.createProductGroup(name: "Hardware", true)
+def std = crmProductService.createPriceList(param: 'standard', name: 'Standard price list', true)
+def product = crmProductService.createProduct(number: "USB18", name: "USB Cable 1.8 meter", group: hardware, true)
+product.addToPrices(priceList: std, unit: 'pcs', outPrice: 6.99, vat: 0.20)
+println "The price for $product is €${product.price} excl. VAT"
+----
+
+=== Search for products
+
+As usual in {gr8crm} plugins the main service has a +list()+ method that performs a query.
+
+TIP: The +list()+ method is +@Selectable+ which means you can use the +selection+ plugin to query for products.
+
++def list(Map query, Map params)+
+
+To search for products you initialize the +query+ map with query values. With the +params+ map you can specify things like
+sort order and pagination. The following query keys can be used in the +query+ map.
+
+[options="header",cols="25,25,50"]
+|===
+| Key             | Description            | Type
+| number          | Product number         | String (wildcard supported)
+| name            | Product name           | String (wildcard supported)
+| group           | Product group          | String (wildcard supported)
+| supplier        | Name of supplier       | String (wildcard supported)
+| suppliersNumber | Supplier's item number | String (wildcard supported)
+| barcode         | Bar code               | String (wildcard supported)
+| customsCode     | Customs code           | String (wildcard supported)
+| weight          | Weight                 | Double
+| price           | Product price          | Double
+| enabled         | Enabled/disabled       | boolean
+|===
+
+The following example will find all enabled products in the *hardware* product group that has *usb* in the product name.
+As you can see you can combine several query values when you search for domain instances.
+
+[source,groovy]
+.FindUsbProducts.groovy
+----
+def result = crmProductService.list([group: 'hardware', name: '*usb*', enabled: true], [:])
+println "Found ${result.size()} USB products"
+----
 
 == Changes
 
