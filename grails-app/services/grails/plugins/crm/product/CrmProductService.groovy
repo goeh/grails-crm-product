@@ -20,6 +20,7 @@ import grails.events.Listener
 import grails.plugins.crm.core.TenantUtils
 import grails.plugins.crm.core.SearchUtils
 import org.codehaus.groovy.grails.web.metaclass.BindDynamicMethod
+import grails.plugins.selection.Selectable
 
 class CrmProductService {
 
@@ -67,6 +68,7 @@ class CrmProductService {
      * @param params pagination parameters
      * @return List of CrmProduct domain instances
      */
+    @Selectable
     def list(Map params = [:]) {
         listProducts([:], params)
     }
@@ -78,6 +80,7 @@ class CrmProductService {
      * @param params pagination parameters
      * @return List of CrmProduct domain instances
      */
+    @Selectable
     def list(Map query, Map params) {
         listProducts(query, params)
     }
@@ -89,7 +92,7 @@ class CrmProductService {
      * @param params pagination parameters
      * @return List of CrmProduct domain instances
      */
-    def listProducts(Map query, Map params) {
+    private List<CrmProduct> listProducts(Map query, Map params) {
         def tagged
         if (query.tags) {
             tagged = crmTagService.findAllIdByTag(CrmProduct, query.tags) ?: [0L]
@@ -126,11 +129,11 @@ class CrmProductService {
             if (query.customsCode) {
                 ilike('customsCode', SearchUtils.wildcard(query.customsCode))
             }
-            if (query.productGroup) {
+            if (query.group || query.productGroup) {
                 group {
                     or {
-                        ilike('name', SearchUtils.wildcard(query.productGroup))
-                        eq('param', query.productGroup)
+                        ilike('name', SearchUtils.wildcard(query.group ?: query.productGroup))
+                        eq('param', query.group ?: query.productGroup)
                     }
                 }
             }
