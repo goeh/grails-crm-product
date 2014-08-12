@@ -31,3 +31,7 @@ a Twitter Bootstrap user interface for managing products.
     dell.addToPrices(priceList: soho, unit: 'pcs', fromAmount: 1, inPrice: 649, outPrice: 1299.99, vat: 0.15)
     dell.addToPrices(priceList: soho, unit: 'pcs', fromAmount: 10, inPrice: 649, outPrice: 1199.99, vat: 0.15)
     dell.addToPrices(priceList: soho, unit: 'pcs', fromAmount: 100, inPrice: 649, outPrice: 999.99, vat: 0.15)
+
+### Documentation
+
+Complete documentation for this plugin can be found at [gr8crm.github.io](http://gr8crm.github.io/plugins/crm-product/)
