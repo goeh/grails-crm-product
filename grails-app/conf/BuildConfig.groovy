@@ -1,16 +1,13 @@
-grails.project.work.dir = "target"
+grails.project.class.dir = "target/classes"
+grails.project.test.class.dir = "target/test-classes"
+grails.project.test.reports.dir = "target/test-reports"
 grails.project.target.level = 1.6
-
-grails.project.repos.default = "crm"
 
 grails.project.dependency.resolution = {
     inherits("global") {}
     log "warn"
     legacyResolve false
     repositories {
-        grailsHome()
-        mavenRepo "http://labs.technipelago.se/repo/crm-releases-local/"
-        mavenRepo "http://labs.technipelago.se/repo/plugins-releases-local/"
         grailsCentral()
         mavenCentral()
     }
@@ -33,39 +30,10 @@ grails.project.dependency.resolution = {
         test(":codenarc:0.21") { export = false }
         test(":code-coverage:1.2.7") { export = false }
 
-        compile "grails.crm:crm-core:latest.integration"
-        compile "grails.crm:crm-contact:latest.integration"
-        compile "grails.crm:crm-tags:latest.integration"
+        compile ":crm-core:2.0.1"
+        compile ":crm-contact:2.0.2"
+        compile ":crm-tags:2.0.0"
 
         compile ":selection:0.9.7"
     }
-}
-
-codenarc {
-    reports = {
-        CrmXmlReport('xml') {
-            outputFile = 'target/CodeNarcReport.xml'
-            title = 'GR8 CRM CodeNarc Report'
-        }
-        CrmHtmlReport('html') {
-            outputFile = 'target/CodeNarcReport.html'
-            title = 'GR8 CRM CodeNarc Report'
-
-        }
-    }
-    properties = {
-        GrailsPublicControllerMethod.enabled = false
-        CatchException.enabled = false
-        CatchThrowable.enabled = false
-        ThrowException.enabled = false
-        ThrowRuntimeException.enabled = false
-        GrailsStatelessService.enabled = false
-        GrailsStatelessService.ignoreFieldNames = "dataSource,scope,sessionFactory,transactional,*Service,messageSource,grailsApplication,applicationContext,expose"
-    }
-    processTestUnit = false
-    processTestIntegration = false
-}
-
-coverage {
-    exclusions = ['**/radar/**']
 }

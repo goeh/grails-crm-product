@@ -1,6 +1,6 @@
 class CrmProductGrailsPlugin {
-    def groupId = "grails.crm"
-    def version = "1.2.1"
+    def groupId = ""
+    def version = "2.0.0"
     def grailsVersion = "2.2 > *"
     def dependsOn = [:]
     def loadAfter = ['crmContact']
@@ -9,13 +9,14 @@ class CrmProductGrailsPlugin {
             "src/groovy/grails/plugins/crm/product/TestSecurityDelegate.groovy",
             "grails-app/views/error.gsp"
     ]
-    def title = "GR8 CRM Product Plugin"
+    def title = "GR8 CRM Product Services"
     def author = "Goran Ehrsson"
     def authorEmail = "goran@technipelago.se"
     def description = '''\
 A GR8 CRM plugin that provides product/item management for orders and sales projects, etc.
+This is a "headless" plugin. Use interface for product management is provided by the crm-product-ui plugin.
 '''
-    def documentation = "https://github.com/goeh/grails-crm-product"
+    def documentation = "http://gr8crm.github.io/plugins/crm-product/"
     def license = "APACHE"
     def organization = [name: "Technipelago AB", url: "http://www.technipelago.se/"]
     def issueManagement = [system: "github", url: "https://github.com/goeh/grails-crm-product/issues"]
@@ -23,7 +24,7 @@ A GR8 CRM plugin that provides product/item management for orders and sales proj
 
     def features = {
         crmProduct {
-            description "Product Catalogue"
+            description "Product Management"
             link controller: "crmProduct", action: "index"
             permissions {
                 guest "crmProduct:index,list,show"
