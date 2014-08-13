@@ -74,6 +74,18 @@ image::product-domain.png[Product Management Domain Model]
 
 Like most other {gr8crm} plugins this plugin have a main service with methods for creating, searching and updating products.
 
+=== Create a product group
+
++CrmProductGroup createProductGroup(Map params, boolean save = false)+
+
+A product belongs to a product group. Product groups can be created with +createProductGroup()+.
+
+=== Create a price list
+
++CrmPriceList createPriceList(Map params, boolean save = false)+
+
+A product can have multiple prices. Each product price references a price list. A price list can be created with a call to +createPriceList()+.
+
 === Create a new product
 
 +CrmProduct createProduct(Map params, boolean save = false)+
@@ -125,6 +137,53 @@ As you can see you can combine several query values when you search for domain i
 def result = crmProductService.list([group: 'hardware', name: '*usb*', enabled: true], [:])
 println "Found ${result.size()} USB products"
 ----
+
+=== Product price
+
++Double getPrice(String productNumber, Integer amount = null, Object priceList = null, String unit = null)+
+
+Because a product can have many prices depending on different price lists or how many items you want to buy,
+retrieving the product price can be complicated. However there is a +price+ property on +CrmProduct+ that makes it easier.
+The price property returns the first available price on the product instance. This works well if you only have one
+price per product. If you have multiple prices per product you can use +CrmProduct#getPrice(...)+ with optional parameters
+or use +CrmProductService#getPrice(...)+.
+
+CrmProductService#getPrice() parameters
+
+- *productNumber* Product number to get price for
+- *amount* Amount to base price on
+- *priceList* +CrmPriceList+ instance or CrmPriceList.param string
+- *unit* unit to get price for
+
+[source,groovy]
+.TestProductPrices.groovy
+----
+def pc = crmProductService.createProductGroup(name: "PC", true)
+def priceList = crmProductService.createPriceList(param: "b2b", name: "Small Businesses", true)
+def p = crmProductService.createProduct(number: "dellxps15", name: "Dell XPS 15\"", group: pc)
+
+p.addToPrices(priceList: priceList, unit: 'pcs', fromAmount: 1, inPrice: 0, outPrice: 1299.99, vat: 0.20)
+p.addToPrices(priceList: priceList, unit: 'pcs', fromAmount: 10, inPrice: 0, outPrice: 1199.99, vat: 0.20)
+p.addToPrices(priceList: priceList, unit: 'pcs', fromAmount: 100, inPrice: 0, outPrice: 999.99, vat: 0.20)
+
+p.save(flush: true)
+
+assert crmProductService.getPrice("dellxps15") == 1299.99
+assert crmProductService.getPrice("dellxps15", 1) == 1299.99
+assert crmProductService.getPrice("dellxps15", 5) == 1299.99
+assert crmProductService.getPrice("dellxps15", 15) == 1199.99
+assert crmProductService.getPrice("dellxps15", 50) == 1199.99
+assert crmProductService.getPrice("dellxps15", 150) == 999.99
+----
+
+=== Delete a product
+
++String deleteProduct(CrmProduct crmProduct)+
+
+A product can be deleted with a call to +deleteProduct+. If the operation succeeds the name of the deleted product will be returned.
+Otherwise an exception will be thrown.
+
+Before the product is deleted the +crmProduct.delete+ event will be sent and after the deletion +crmProduct.deleted+ will be sent.
 
 == Changes
 
