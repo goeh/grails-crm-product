@@ -27,6 +27,7 @@ class CrmProductService {
     static transactional = true
 
     def crmTagService
+    def crmSecurityService
 
     @Listener(namespace = "crmProduct", topic = "enableFeature")
     def enableFeature(event) {
@@ -151,10 +152,33 @@ class CrmProductService {
         }
     }
 
+    /**
+     * Find a product based on primary key.
+     *
+     * @param id
+     * @return
+     */
+    CrmProduct getProduct(Long id) {
+        CrmProduct.findByIdAndTenantId(id, TenantUtils.tenant)
+    }
+
+    /**
+     * Find a product based on product number
+     *
+     * @param number product/item number
+     * @return
+     */
     CrmProduct getProduct(String number) {
         CrmProduct.findByNumberAndTenantId(number, TenantUtils.tenant)
     }
 
+    /**
+     * Create a new product.
+     *
+     * @param params property values
+     * @param save true if the product should be saved immediately
+     * @return
+     */
     CrmProduct createProduct(Map params, boolean save = false) {
         def tenant = TenantUtils.tenant
         def m = CrmProduct.findByNumberAndTenantId(params.number, tenant)
@@ -176,14 +200,40 @@ class CrmProductService {
         return m
     }
 
+    /**
+     * Update existing product.
+     *
+     * @param crmProduct
+     * @param params
+     * @return
+     */
     boolean updateProduct(CrmProduct crmProduct, Map params) {
         def args = [crmProduct, params, [include: CrmProduct.BIND_WHITELIST]]
         new BindDynamicMethod().invoke(crmProduct, 'bind', args.toArray())
         return crmProduct.validate()
     }
 
-    def deleteProduct(CrmProduct crmProduct) {
-        crmProduct.delete()
+    /**
+     * Delete a product.
+     *
+     * @param crmProduct
+     * @return name of deleted product
+     */
+    String deleteProduct(CrmProduct crmProduct) {
+        def tombstone = crmProduct.toString()
+        def id = crmProduct.id
+        def tenant = crmProduct.tenantId
+        def username = crmSecurityService.currentUser?.username
+
+        event(for: "crmProduct", topic: "delete", fork: false, data: [id: id, tenant: tenant, user: username, name: tombstone])
+
+        crmProduct.delete(flush: true)
+
+        log.debug "Deleted product #$id in tenant $tenant \"${tombstone}\""
+
+        event(for: "crmProduct", topic: "deleted", data: [id: id, tenant: tenant, user: username, name: tombstone])
+
+        return tombstone
     }
 
     def listProductGroups(Map params) {
@@ -220,7 +270,7 @@ class CrmProductService {
     }
 
     def deleteProductGroup(CrmProductGroup group) {
-        group.delete()
+        group.delete(flush: true)
     }
 
     def listPriceLists(Map params) {
