@@ -19,6 +19,8 @@ package grails.plugins.crm.product
 import grails.events.Listener
 import grails.plugins.crm.core.TenantUtils
 import grails.plugins.crm.core.SearchUtils
+import grails.plugins.crm.core.CrmValidationException
+import groovy.transform.CompileStatic
 import org.codehaus.groovy.grails.web.metaclass.BindDynamicMethod
 import grails.plugins.selection.Selectable
 
@@ -28,13 +30,19 @@ class CrmProductService {
 
     def crmTagService
     def crmSecurityService
+    def messageSource
 
     @Listener(namespace = "crmProduct", topic = "enableFeature")
     def enableFeature(event) {
         // event = [feature: feature, tenant: tenant, role:role, expires:expires]
-        def tenant = event.tenant
-        TenantUtils.withTenant(tenant) {
+        def tenant = crmSecurityService.getTenantInfo(event.tenant)
+        if (!tenant) {
+            throw new IllegalArgumentException("Cannot find tenant info for tenant [${event.tenant}], event=$event")
+        }
+        TenantUtils.withTenant(tenant.id) {
             crmTagService.createTag(name: CrmProduct.name, multiple: true)
+            def s = messageSource.getMessage("crmProduct.name.standard", null, "Standard", tenant.locale)
+            createPriceList(name: s, param: "standard", true)
         }
     }
 
@@ -61,6 +69,18 @@ class CrmProductService {
         CrmProductGroup.findAllByTenantId(tenant)*.delete()
         CrmPriceList.findAllByTenantId(tenant)*.delete()
         log.warn("Deleted ${result.size()} products in tenant $tenant")
+    }
+
+    @CompileStatic
+    private String paramify(final String name, Integer maxSize = 20) {
+        String param = name.toLowerCase().replace(' ', '-')
+        if (param.length() > maxSize) {
+            param = param[0..(maxSize - 1)]
+            if (param[-1] == '-') {
+                param = param[0..-2]
+            }
+        }
+        param
     }
 
     /**
@@ -117,9 +137,7 @@ class CrmProductService {
                 }
             }
             if (query.supplier) {
-                supplier {
-                    ilike('name', SearchUtils.wildcard(query.supplier))
-                }
+                ilike('supplierName', SearchUtils.wildcard(query.supplier))
             }
             if (query.suppliersNumber) {
                 ilike('suppliersNumber', SearchUtils.wildcard(query.suppliersNumber))
@@ -172,6 +190,68 @@ class CrmProductService {
         CrmProduct.findByNumberAndTenantId(number, TenantUtils.tenant)
     }
 
+    private CrmProduct useProductInstance(CrmProduct crmProduct = null) {
+        def tenant = TenantUtils.tenant
+        if (crmProduct == null) {
+            crmProduct = new CrmProduct()
+        }
+        if (crmProduct.tenantId) {
+            if (crmProduct.tenantId != tenant) {
+                throw new IllegalStateException("The current tenant is [$tenant] and the specified domain instance belongs to another tenant [${crmProduct.tenantId}]")
+            }
+        } else {
+            crmProduct.tenantId = tenant
+        }
+        crmProduct
+    }
+
+    /**
+     * Initialize a product with default parameters.
+     *
+     * @param crmProduct the product instance to initialize, or null to have it created for you
+     * @param params property values
+     * @return
+     */
+    CrmProduct init(CrmProduct crmProduct, Map params, Locale locale = null) {
+        crmProduct = useProductInstance(crmProduct)
+        def args = [crmProduct, params, [include: CrmProduct.BIND_WHITELIST]]
+        new BindDynamicMethod().invoke(crmProduct, 'bind', args.toArray())
+        crmProduct.tenantId = TenantUtils.tenant
+        if (params.enabled == null) {
+            crmProduct.enabled = true
+        }
+        crmProduct.validate() // to trigger beforeValidate() setters
+        crmProduct.clearErrors()
+        return crmProduct
+    }
+
+    /**
+     * Save a product instance product.
+     *
+     * @param crmProduct the product instance to save, or null to have it created for you
+     * @param params property values
+     * @return
+     */
+    CrmProduct save(CrmProduct crmProduct, Map params) {
+        crmProduct = useProductInstance(crmProduct)
+        if (params.group instanceof String) {
+            params.group = getProductGroup(params.group)
+        }
+        def args = [crmProduct, params, [include: CrmProduct.BIND_WHITELIST]]
+        new BindDynamicMethod().invoke(crmProduct, 'bind', args.toArray())
+        if (params.enabled == null) {
+            crmProduct.enabled = true
+        }
+        if (crmProduct.save()) {
+            return crmProduct
+        } else {
+            // Eager fetch associations to avoid LazyInitializationException
+            crmProduct.prices.size()
+            crmProduct.compositions.size()
+        }
+        throw new CrmValidationException('crmProduct.validation.error', crmProduct)
+    }
+
     /**
      * Create a new product.
      *
@@ -193,8 +273,6 @@ class CrmProductService {
             if (save) {
                 m.save()
             } else {
-                m.validate()
-                m.clearErrors()
             }
         }
         return m
@@ -246,9 +324,14 @@ class CrmProductService {
 
     CrmProductGroup createProductGroup(Map params, boolean save = false) {
         def tenant = TenantUtils.tenant
-        def m = CrmProductGroup.findByNameAndTenantId(params.name, tenant)
+        if (!params.param && params.name) {
+            params.param = paramify(params.name, new CrmProductGroup().constraints.param.maxSize)
+        }
+        def m = CrmProductGroup.findByParamAndTenantId(params.param, tenant)
         if (!m) {
-            m = new CrmProductGroup(params)
+            m = new CrmProductGroup()
+            def args = [m, params, [include: CrmProductGroup.BIND_WHITELIST]]
+            new BindDynamicMethod().invoke(m, 'bind', args.toArray())
             m.tenantId = tenant
             if (params.enabled == null) {
                 m.enabled = true
@@ -279,10 +362,14 @@ class CrmProductService {
 
     CrmPriceList createPriceList(Map params, boolean save = false) {
         def tenant = TenantUtils.tenant
-        def m = CrmPriceList.findByNameAndTenantId(params.name, tenant)
+        if (!params.param && params.name) {
+            params.param = paramify(params.name, new CrmPriceList().constraints.param.maxSize)
+        }
+        def m = CrmPriceList.findByParamAndTenantId(params.param, tenant)
         if (!m) {
             m = new CrmPriceList()
-            m.properties = params
+            def args = [m, params, [include: CrmPriceList.BIND_WHITELIST]]
+            new BindDynamicMethod().invoke(m, 'bind', args.toArray())
             m.tenantId = tenant
             if (params.enabled == null) {
                 m.enabled = true
@@ -305,6 +392,23 @@ class CrmProductService {
 
     def deletePriceList(CrmPriceList priceList) {
         priceList.delete()
+    }
+
+    /**
+     * Get all product prices sorted by price list and unit/amount.
+     *
+     * @param crmProduct
+     * @return
+     */
+    List<CrmProductPrice> findProductPrices(CrmProduct crmProduct) {
+        CrmProductPrice.createCriteria().list() {
+            eq('product', crmProduct)
+            priceList {
+                order 'orderIndex', 'asc'
+            }
+            order 'unit'
+            order 'fromAmount'
+        }
     }
 
     /**
