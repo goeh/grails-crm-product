@@ -16,7 +16,6 @@
 
 package grails.plugins.crm.product
 
-import grails.plugins.crm.contact.CrmContact
 import grails.plugins.crm.core.TenantEntity
 import grails.plugins.crm.core.TenantUtils
 
@@ -24,7 +23,7 @@ import grails.plugins.crm.core.TenantUtils
 class CrmProduct {
 
     public static final List BIND_WHITELIST = ['number', 'name', 'displayNumber', 'displayName', 'description',
-            'supplier', 'suppliersNumber', 'group', 'barcode', 'customsCode', 'weight', 'enabled', 'prices']
+            'supplierId', 'supplierName', 'suppliersNumber', 'group', 'barcode', 'customsCode', 'weight', 'enabled', 'prices']
 
     String number
     String name
@@ -32,7 +31,8 @@ class CrmProduct {
     String displayName
     String description
     String suppliersNumber
-    CrmContact supplier
+    String supplierName
+    Long supplierId
     CrmProductGroup group
     String barcode
     String customsCode
@@ -48,8 +48,9 @@ class CrmProduct {
         displayNumber(maxSize: 80, nullable: true)
         displayName(maxSize: 255, nullable: true)
         description(maxSize: 2000, nullable: true, widget: 'textarea')
-        supplier(nullable: true)
         suppliersNumber(maxSize: 40, nullable: true)
+        supplierName(maxSize: 80, nullable: true)
+        supplierId(nullable: true)
         group()
         barcode(maxSize: 255, nullable: true)
         customsCode(maxSize: 10, nullable: true)
@@ -62,7 +63,7 @@ class CrmProduct {
         compositions sort: 'product', 'asc'
     }
 
-    static transients = ['preferredName', 'productPrice', 'price', 'vat', 'unit', 'related', 'includes', 'excludes', 'depends']
+    static transients = ['preferredName', 'productPrice', 'price', 'vat', 'unit', 'related', 'includes', 'excludes', 'depends', 'supplier']
 
     static taggable = true
     static attachmentable = true
@@ -72,6 +73,10 @@ class CrmProduct {
 
     transient String getPreferredName() {
         displayName ?: name
+    }
+
+    transient String getSupplier() {
+        supplierName
     }
 
     transient CrmProductPrice getProductPrice(Number amount = 0.0, Object priceList = null, String unit = null) {
