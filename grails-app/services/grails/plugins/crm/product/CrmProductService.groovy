@@ -246,8 +246,8 @@ class CrmProductService {
             return crmProduct
         } else {
             // Eager fetch associations to avoid LazyInitializationException
-            crmProduct.prices.size()
-            crmProduct.compositions.size()
+            crmProduct.prices?.size()
+            crmProduct.compositions?.size()
         }
         throw new CrmValidationException('crmProduct.validation.error', crmProduct)
     }
