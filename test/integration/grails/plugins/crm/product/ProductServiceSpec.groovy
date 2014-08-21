@@ -25,11 +25,16 @@ class ProductServiceSpec extends grails.plugin.spock.IntegrationSpec {
 
     def crmProductService
 
-    @Shared pc
-    @Shared mac
-    @Shared foo
-    @Shared car
-    @Shared priceList
+    @Shared
+            pc
+    @Shared
+            mac
+    @Shared
+            foo
+    @Shared
+            car
+    @Shared
+            priceList
 
     def setup() {
         pc = crmProductService.createProductGroup(name: "PC", true)
@@ -177,12 +182,22 @@ class ProductServiceSpec extends grails.plugin.spock.IntegrationSpec {
 
     def "type symbols"() {
         expect:
-        new CrmProductComposition(type:CrmProductComposition.EXCLUDES).typeSymbol == 'excludes'
-        new CrmProductComposition(type:CrmProductComposition.INCLUDES).typeSymbol == 'includes'
-        new CrmProductComposition(type:CrmProductComposition.DEPENDS).typeSymbol == 'depends'
-        new CrmProductComposition(type:CrmProductComposition.EQUIVALENT).typeSymbol == 'equivalent'
-        new CrmProductComposition(type:CrmProductComposition.REPLACES).typeSymbol == 'replaces'
-        new CrmProductComposition(type:CrmProductComposition.OPTION).typeSymbol == 'option'
-        new CrmProductComposition(type:CrmProductComposition.RELATED).typeSymbol == 'related'
+        new CrmProductComposition(type: CrmProductComposition.EXCLUDES).typeSymbol == 'excludes'
+        new CrmProductComposition(type: CrmProductComposition.INCLUDES).typeSymbol == 'includes'
+        new CrmProductComposition(type: CrmProductComposition.DEPENDS).typeSymbol == 'depends'
+        new CrmProductComposition(type: CrmProductComposition.EQUIVALENT).typeSymbol == 'equivalent'
+        new CrmProductComposition(type: CrmProductComposition.REPLACES).typeSymbol == 'replaces'
+        new CrmProductComposition(type: CrmProductComposition.OPTION).typeSymbol == 'option'
+        new CrmProductComposition(type: CrmProductComposition.RELATED).typeSymbol == 'related'
+    }
+
+    def "test supplier name"() {
+        when: "create a product with a supplier name"
+        def p = new CrmProduct(supplierName: "Groovy Tools Inc.")
+
+        then: "the transient supplier property returns supplier name"
+        p.supplierId == null
+        p.supplierName == "Groovy Tools Inc."
+        p.supplier == p.supplierName
     }
 }
