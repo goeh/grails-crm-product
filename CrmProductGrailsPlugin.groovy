@@ -3,7 +3,7 @@ class CrmProductGrailsPlugin {
     def version = "2.0.0"
     def grailsVersion = "2.2 > *"
     def dependsOn = [:]
-    def loadAfter = ['crmContact']
+    def loadAfter = ['crmCore']
     def pluginExcludes = [
             "grails-app/conf/ApplicationResources.groovy",
             "src/groovy/grails/plugins/crm/product/ProductTestSecurityDelegate.groovy",
