@@ -200,4 +200,44 @@ class ProductServiceSpec extends grails.plugin.spock.IntegrationSpec {
         p.supplierName == "Groovy Tools Inc."
         p.supplier == p.supplierName
     }
+
+    def "test initProduct"() {
+        when: "create a product with staggered prices"
+        def p = crmProductService.initProduct(null, [number: "dellxps15", name: "Dell XPS 15\"", 'group.id': pc.id])
+
+        then:
+        !p.hasErrors()
+        !p.ident()
+
+        when:
+        crmProductService.addPrice(p, priceList, 1, 'pcs', 0, 1299.99, 0.25)
+        crmProductService.addPrice(p, 'b2b', 10, 'pcs', 0, 1199.99, 0.25)
+        crmProductService.addPrice(p, 'b2b', 100, 'pcs', 0, 999.99, 0.25)
+        p.save(flush:true)
+
+        then: "check that we get correct prices"
+        p.ident()
+        crmProductService.getPrice("dellxps15") == 1299.99
+        crmProductService.getPrice("dellxps15", 1) == 1299.99
+        crmProductService.getPrice("dellxps15", 5) == 1299.99
+        crmProductService.getPrice("dellxps15", 15) == 1199.99
+        crmProductService.getPrice("dellxps15", 50) == 1199.99
+        crmProductService.getPrice("dellxps15", 150) == 999.99
+    }
+
+    def "test saveProduct"() {
+        when: "create a product"
+        def p = crmProductService.saveProduct(null, [number: "dellxps15", name: "Dell XPS 15\"", 'group.id': pc.id])
+
+        then:
+        p.ident()
+        p.group.param == 'pc'
+
+        when:
+        p = crmProductService.saveProduct(p, [supplierName: "Dell"])
+
+        then:
+        p.supplier == "Dell"
+        p.number == "dellxps15"
+    }
 }
