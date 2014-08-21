@@ -4,8 +4,6 @@ Göran Ehrsson <goran@technipelago.se>
 :homepage: http://gr8crm.github.io
 :license: This plugin is licensed with http://www.apache.org/licenses/LICENSE-2.0.html[Apache License version 2.0]
 
-= GR8 CRM - Product Plugin
-
 CRM = http://en.wikipedia.org/wiki/Customer_relationship_management[Customer Relationship Management]
 
 GR8 CRM is a set of http://www.grails.org/[Grails Web Application Framework]
