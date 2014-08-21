@@ -212,7 +212,7 @@ class CrmProductService {
      * @param params property values
      * @return
      */
-    CrmProduct init(CrmProduct crmProduct, Map params, Locale locale = null) {
+    CrmProduct initProduct(CrmProduct crmProduct, Map params, Locale locale = null) {
         crmProduct = useProductInstance(crmProduct)
         def args = [crmProduct, params, [include: CrmProduct.BIND_WHITELIST]]
         new BindDynamicMethod().invoke(crmProduct, 'bind', args.toArray())
@@ -232,7 +232,7 @@ class CrmProductService {
      * @param params property values
      * @return
      */
-    CrmProduct save(CrmProduct crmProduct, Map params) {
+    CrmProduct saveProduct(CrmProduct crmProduct, Map params) {
         crmProduct = useProductInstance(crmProduct)
         if (params.group instanceof String) {
             params.group = getProductGroup(params.group)
@@ -356,6 +356,10 @@ class CrmProductService {
         group.delete(flush: true)
     }
 
+    CrmPriceList getPriceList(String param) {
+        CrmPriceList.findByParamAndTenantId(param, TenantUtils.tenant)
+    }
+
     def listPriceLists(Map params) {
         CrmPriceList.findAllByTenantId(TenantUtils.tenant, params)
     }
@@ -422,5 +426,36 @@ class CrmProductService {
      */
     Double getPrice(String productNumber, Integer amount = null, Object priceList = null, String unit = null) {
         CrmProduct.findByNumberAndTenantId(productNumber, TenantUtils.tenant, [cache: true])?.getPrice(amount, priceList, unit)
+    }
+
+    /**
+     * Add a price to a product instance.
+     *
+     * @param crmProduct
+     * @param priceList CrmPriceList instance or a price list's param value
+     * @param fromAmount
+     * @param unit
+     * @param inPrice
+     * @param outPrice
+     * @param vat
+     * @return
+     */
+    CrmProductPrice addPrice(CrmProduct crmProduct, Object priceList, Double fromAmount, String unit, Double inPrice, Double outPrice, Double vat) {
+        def tenant = TenantUtils.tenant
+        if (crmProduct?.tenantId != null && crmProduct.tenantId != tenant) {
+            throw new IllegalStateException("The current tenant is [$tenant] and the specified domain instance belongs to another tenant [${crmProduct.tenantId}]")
+        }
+        if (!(priceList instanceof CrmPriceList)) {
+            CrmPriceList tmp = getPriceList(priceList.toString())
+            if (!tmp) {
+                throw new IllegalArgumentException("CrmPriceList with param [$priceList] not found in tenant [$tenant]")
+            }
+            priceList = tmp
+        }
+        def price = new CrmProductPrice(product: crmProduct, priceList: priceList, unit: unit, fromAmount: fromAmount, inPrice: inPrice, outPrice: outPrice, vat: vat)
+        if (!price.hasErrors()) {
+            crmProduct.addToPrices(price)
+        }
+        return price
     }
 }
