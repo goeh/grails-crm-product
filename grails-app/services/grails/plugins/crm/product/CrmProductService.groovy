@@ -305,6 +305,7 @@ class CrmProductService {
 
         event(for: "crmProduct", topic: "delete", fork: false, data: [id: id, tenant: tenant, user: username, name: tombstone])
 
+        CrmProductComposition.findAllByProduct(crmProduct)*.delete()
         crmProduct.delete(flush: true)
 
         log.debug "Deleted product #$id in tenant $tenant \"${tombstone}\""
