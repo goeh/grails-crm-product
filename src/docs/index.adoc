@@ -62,7 +62,8 @@ image::product-domain.png[Product Management Domain Model]
 | displayName       | String          | Secondary product name, typically displayed in web shop or catalogues
 | description       | String          | A longer description of the product (max 2000 characters)
 | suppliersNumber   | String          | The supplier's item number
-| supplier          | CrmContact      | Supplier reference
+| supplierId        | Long            | Supplier identity (primary key), if supplier exists as a CrmContact
+| supplierName      | String          | Name of the product's supplier
 | group             | CrmProductGroup | Product group
 | barcode           | String          | The product's bar code
 | customsCode       | String          | The product's customs code
