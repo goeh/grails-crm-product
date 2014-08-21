@@ -23,7 +23,8 @@ import grails.plugins.crm.core.TenantUtils
 class CrmProduct {
 
     public static final List BIND_WHITELIST = ['number', 'name', 'displayNumber', 'displayName', 'description',
-            'supplierId', 'supplierName', 'suppliersNumber', 'group', 'barcode', 'customsCode', 'weight', 'enabled', 'prices']
+            'supplierId', 'supplierName', 'suppliersNumber', 'group', 'barcode', 'customsCode', 'weight', 'enabled',
+            'prices', 'compositions']
 
     String number
     String name
