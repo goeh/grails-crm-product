@@ -16,7 +16,7 @@
 
 class CrmProductGrailsPlugin {
     def groupId = ""
-    def version = "2.0.0"
+    def version = "2.0.1-SNAPSHOT"
     def grailsVersion = "2.2 > *"
     def dependsOn = [:]
     def loadAfter = ['crmCore']
@@ -40,14 +40,7 @@ This is a "headless" plugin. Use interface for product management is provided by
 
     def features = {
         crmProduct {
-            description "Product Management"
-            link controller: "crmProduct", action: "index"
-            permissions {
-                guest "crmProduct:index,list,show"
-                partner "crmProduct:index,list,show"
-                user "crmProduct:*"
-                admin "crmProduct,crmProductGroup,crmPriceList:*"
-            }
+            description "Product Management Services"
             hidden true
         }
     }
