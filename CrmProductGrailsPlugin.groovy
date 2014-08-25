@@ -30,7 +30,7 @@ class CrmProductGrailsPlugin {
     def authorEmail = "goran@technipelago.se"
     def description = '''\
 A GR8 CRM plugin that provides product/item management for orders and sales projects, etc.
-This is a "headless" plugin. Use interface for product management is provided by the crm-product-ui plugin.
+This is a "headless" plugin. User interface for product management is provided by the crm-product-ui plugin.
 '''
     def documentation = "http://gr8crm.github.io/plugins/crm-product/"
     def license = "APACHE"
