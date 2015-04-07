@@ -23,6 +23,7 @@ import grails.plugins.crm.core.CrmValidationException
 import groovy.transform.CompileStatic
 import org.codehaus.groovy.grails.web.metaclass.BindDynamicMethod
 import grails.plugins.selection.Selectable
+import org.grails.databinding.SimpleMapDataBindingSource
 
 class CrmProductService {
 
@@ -31,6 +32,7 @@ class CrmProductService {
     def crmTagService
     def crmSecurityService
     def messageSource
+    def grailsWebDataBinder
 
     @Listener(namespace = "crmProduct", topic = "enableFeature")
     def enableFeature(event) {
@@ -71,7 +73,6 @@ class CrmProductService {
         log.warn("Deleted ${result.size()} products in tenant $tenant")
     }
 
-    @CompileStatic
     private String paramify(final String name, Integer maxSize = 20) {
         String param = name.toLowerCase().replace(' ', '-')
         if (param.length() > maxSize) {
@@ -211,11 +212,11 @@ class CrmProductService {
      * @param crmProduct the product instance to initialize, or null to have it created for you
      * @param params property values
      * @return
+     * @deprecated use createProduct with boolean save = false
      */
     CrmProduct initProduct(CrmProduct crmProduct, Map params, Locale locale = null) {
         crmProduct = useProductInstance(crmProduct)
-        def args = [crmProduct, params, [include: CrmProduct.BIND_WHITELIST]]
-        new BindDynamicMethod().invoke(crmProduct, 'bind', args.toArray())
+        grailsWebDataBinder.bind(crmProduct, params as SimpleMapDataBindingSource, null, CrmProduct.BIND_WHITELIST, null, null)
         crmProduct.tenantId = TenantUtils.tenant
         if (params.enabled == null) {
             crmProduct.enabled = true
@@ -237,8 +238,7 @@ class CrmProductService {
         if (params.group instanceof String) {
             params.group = getProductGroup(params.group)
         }
-        def args = [crmProduct, params, [include: CrmProduct.BIND_WHITELIST]]
-        new BindDynamicMethod().invoke(crmProduct, 'bind', args.toArray())
+        grailsWebDataBinder.bind(crmProduct, params as SimpleMapDataBindingSource, null, CrmProduct.BIND_WHITELIST, null, null)
         if (params.enabled == null) {
             crmProduct.enabled = true
         }
@@ -264,8 +264,7 @@ class CrmProductService {
         def m = CrmProduct.findByNumberAndTenantId(params.number, tenant)
         if (!m) {
             m = new CrmProduct()
-            def args = [m, params, [include: CrmProduct.BIND_WHITELIST]]
-            new BindDynamicMethod().invoke(m, 'bind', args.toArray())
+            grailsWebDataBinder.bind(m, params as SimpleMapDataBindingSource, null, CrmProduct.BIND_WHITELIST, null, null)
             m.tenantId = tenant
             if (params.enabled == null) {
                 m.enabled = true
@@ -273,6 +272,8 @@ class CrmProductService {
             if (save) {
                 m.save()
             } else {
+                m.validate() // to trigger beforeValidate() setters
+                m.clearErrors()
             }
         }
         return m
@@ -286,8 +287,7 @@ class CrmProductService {
      * @return
      */
     boolean updateProduct(CrmProduct crmProduct, Map params) {
-        def args = [crmProduct, params, [include: CrmProduct.BIND_WHITELIST]]
-        new BindDynamicMethod().invoke(crmProduct, 'bind', args.toArray())
+        grailsWebDataBinder.bind(crmProduct, params as SimpleMapDataBindingSource, null, CrmProduct.BIND_WHITELIST, null, null)
         return crmProduct.validate()
     }
 
@@ -331,8 +331,7 @@ class CrmProductService {
         def m = CrmProductGroup.findByParamAndTenantId(params.param, tenant)
         if (!m) {
             m = new CrmProductGroup()
-            def args = [m, params, [include: CrmProductGroup.BIND_WHITELIST]]
-            new BindDynamicMethod().invoke(m, 'bind', args.toArray())
+            grailsWebDataBinder.bind(m, params as SimpleMapDataBindingSource, null, CrmProductGroup.BIND_WHITELIST, null, null)
             m.tenantId = tenant
             if (params.enabled == null) {
                 m.enabled = true
@@ -348,8 +347,7 @@ class CrmProductService {
     }
 
     boolean updateProductGroup(CrmProductGroup productGroup, Map params) {
-        def args = [productGroup, params]
-        new BindDynamicMethod().invoke(productGroup, 'bind', args.toArray())
+        grailsWebDataBinder.bind(productGroup, params as SimpleMapDataBindingSource, null, CrmProductGroup.BIND_WHITELIST, null, null)
         return productGroup.validate()
     }
 
@@ -373,8 +371,7 @@ class CrmProductService {
         def m = CrmPriceList.findByParamAndTenantId(params.param, tenant)
         if (!m) {
             m = new CrmPriceList()
-            def args = [m, params, [include: CrmPriceList.BIND_WHITELIST]]
-            new BindDynamicMethod().invoke(m, 'bind', args.toArray())
+            grailsWebDataBinder.bind(m, params as SimpleMapDataBindingSource, null, CrmPriceList.BIND_WHITELIST, null, null)
             m.tenantId = tenant
             if (params.enabled == null) {
                 m.enabled = true
@@ -390,8 +387,7 @@ class CrmProductService {
     }
 
     boolean updatePriceList(CrmPriceList priceList, Map params) {
-        def args = [priceList, params]
-        new BindDynamicMethod().invoke(priceList, 'bind', args.toArray())
+        grailsWebDataBinder.bind(priceList, params as SimpleMapDataBindingSource, null, CrmPriceList.BIND_WHITELIST, null, null)
         return priceList.validate()
     }
 

@@ -21,7 +21,7 @@ import spock.lang.Shared
 /**
  * Tests for CrmProductService.
  */
-class ProductServiceSpec extends grails.plugin.spock.IntegrationSpec {
+class ProductServiceSpec extends grails.test.spock.IntegrationSpec {
 
     def crmProductService
 
@@ -203,10 +203,10 @@ class ProductServiceSpec extends grails.plugin.spock.IntegrationSpec {
 
     def "test initProduct"() {
         when: "create a product with staggered prices"
-        def p = crmProductService.initProduct(null, [number: "dellxps15", name: "Dell XPS 15\"", 'group.id': pc.id])
+        def p = crmProductService.initProduct(null, [number: "dellxps15", name: "Dell XPS 15\"", group: [id: pc.id]])
 
         then:
-        !p.hasErrors()
+        p.validate()
         !p.ident()
 
         when:
@@ -227,9 +227,10 @@ class ProductServiceSpec extends grails.plugin.spock.IntegrationSpec {
 
     def "test saveProduct"() {
         when: "create a product"
-        def p = crmProductService.saveProduct(null, [number: "dellxps15", name: "Dell XPS 15\"", 'group.id': pc.id])
+        def p = crmProductService.saveProduct(null, [number: "dellxps15", name: "Dell XPS 15\"", group: [id: pc.id]])
 
         then:
+        p.validate()
         p.ident()
         p.group.param == 'pc'
 
