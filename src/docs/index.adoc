@@ -188,6 +188,7 @@ Before the product is deleted the +crmProduct.delete+ event will be sent and aft
 
 == Changes
 
+2.4.1:: Plugin upgraded to Grails 2.4.5
 2.4.0:: First version to support Grails 2.4.x
 2.0.1:: Fixed cascading problem when deleting a product with relations
 2.0.0:: First public release
