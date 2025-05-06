@@ -36,16 +36,16 @@ grails.project.dependency.resolution = {
             export = false
         }
 
-        test(":codenarc:0.25.2") { export = false }
-        test(":code-coverage:2.0.3-3") { export = false }
+        //test(":codenarc:0.25.2") { export = false }
+        //test(":code-coverage:2.0.3-3") { export = false }
 
-        compile ":crm-security:2.4.3"
-        compile ":crm-tags:2.4.2"
+        compile ":crm-security:2.4.5"
+        compile ":crm-tags:2.4.3"
 
-        compile ":selection:0.9.8"
+        compile ":selection:0.9.9"
     }
 }
-
+/*
 codenarc.reports = {
     xmlReport('xml') {
         outputFile = 'target/CodeNarcReport.xml'
@@ -54,3 +54,4 @@ codenarc.reports = {
         outputFile = 'target/CodeNarcReport.html'
     }
 }
+*/
